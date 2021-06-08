@@ -23,7 +23,7 @@ defineProps({
 const state = reactive({ count: 0 })
 </script>
 
-<style scoped>
+<style scoped lang="postcss">
 
   p{
     a {
