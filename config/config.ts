@@ -19,7 +19,7 @@ export default defineConfig({
   fastRefresh: {},
   proxy: {
     '/api': {
-      target: 'http://192.168.20.93:8080',
+      target: 'http://localhost:8080',
       changeOrigin: true,
       pathRewrite: { '^/api': '/api' },
     },
