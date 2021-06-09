@@ -6,8 +6,8 @@ import { QuestionCircleOutlined, SearchOutlined } from '@ant-design/icons';
 import type { ProColumns } from '@ant-design/pro-table';
 import ProTable, { TableDropdown } from '@ant-design/pro-table';
 import Form from './form';
-type TableListItem = {
-  id: string;
+export type BranchItem = {
+  id?: string;
   name: string;
   latitude: number;
   longitude: number;
@@ -25,8 +25,8 @@ type TableListItem = {
   remark: string;
   created: number;
 };
-const tableListDataSource: TableListItem[] = [];
-const columns: ProColumns<TableListItem>[] = [
+const tableListDataSource: BranchItem[] = [];
+const columns: ProColumns<BranchItem>[] = [
   {
     title: '排序',
     dataIndex: 'index',
@@ -125,7 +125,7 @@ const columns: ProColumns<TableListItem>[] = [
 
 export default () => {
   return (
-    <ProTable<TableListItem>
+    <ProTable<BranchItem>
       columns={columns}
       rowSelection={{}}
       tableAlertRender={({

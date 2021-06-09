@@ -2,13 +2,6 @@ import axios from 'axios';
 const instance = axios.create({
   // baseURL: '/api',
   timeout: 3000,
-  transformResponse: [
-    function (data) {
-      // Do whatever you want to transform the data
-
-      return data;
-    },
-  ],
 });
 instance.interceptors.response.use(
   function (response) {
