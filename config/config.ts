@@ -17,4 +17,11 @@ export default defineConfig({
   },
   routes,
   fastRefresh: {},
+  proxy: {
+    '/api': {
+      target: 'http://192.168.20.93:8080',
+      changeOrigin: true,
+      pathRewrite: { '^/api': '/api' },
+    },
+  },
 });
