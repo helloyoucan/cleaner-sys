@@ -85,6 +85,11 @@ export default (props: Prop) => {
           width="sm"
           name="province"
           placeholder="请选择省"
+          fieldProps={{
+            optionItemRender(item) {
+              return item.value;
+            },
+          }}
           disabled={readOnly}
         />
         <ProFormDependency name={['province']}>
