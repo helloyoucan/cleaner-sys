@@ -1,30 +1,15 @@
 import styles from './index.less';
+import { useRef } from 'react';
 import { getBranch } from '@/api/index';
+import type { BranchItem } from '@/api/index';
 import cityOptions from './city';
 import { Button, Tooltip, Input, Space, Table, Cascader } from 'antd';
+import type { FormInstance } from 'antd';
 import { QuestionCircleOutlined, SearchOutlined } from '@ant-design/icons';
 import type { ProColumns } from '@ant-design/pro-table';
 import ProTable, { TableDropdown } from '@ant-design/pro-table';
 import Form from './form';
-export type BranchItem = {
-  id?: string;
-  name: string;
-  latitude: number;
-  longitude: number;
-  province: string;
-  city: string;
-  area: string;
-  address: string;
-  contact_person: string;
-  contact_phone: number;
-  warrior_manager_id: string;
-  range: number;
-  base_cost: number;
-  extra_range_unit_price: number;
-  status: number;
-  remark: string;
-  created: number;
-};
+
 const tableListDataSource: BranchItem[] = [];
 const columns: ProColumns<BranchItem>[] = [
   {
@@ -124,8 +109,10 @@ const columns: ProColumns<BranchItem>[] = [
 ];
 
 export default () => {
+  const ref = useRef<FormInstance>();
   return (
     <ProTable<BranchItem>
+      formRef={ref}
       columns={columns}
       rowSelection={{}}
       tableAlertRender={({
@@ -151,18 +138,22 @@ export default () => {
       }}
       request={(params, sorter, filter) => {
         // 表单搜索项会从 params 传入，传递给后端接口。
-        console.log(params, sorter, filter);
-        return getBranch({ page: 1, page_size: 5 }).then((res: any) => {
-          console.log(res);
+        return getBranch({
+          page: params.current,
+          page_size: params.pageSize,
+        }).then((res) => {
+          if (res.code != 0) {
+            return {
+              data: [],
+              success: false,
+            };
+          }
           return {
-            data: res.data.list,
+            data: res.data?.list,
             success: true,
+            total: res.data.pages.total,
           };
         });
-        // return Promise.resolve({
-        //   data: tableListDataSource,
-        //   success: true,
-        // });
       }}
       rowKey="id"
       pagination={{
@@ -177,10 +168,7 @@ export default () => {
       }}
       options={{ fullScreen: true }}
       toolBarRender={() => [
-        <Form></Form>,
-        // <Button type="primary" key="primary">
-        //   创建应用
-        // </Button>,
+        <Form onClose={() => ref?.current?.submit()}></Form>,
       ]}
     />
   );
