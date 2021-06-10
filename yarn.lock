@@ -49,7 +49,7 @@
     react-color "2.19.3"
     swr "^0.5.6"
 
-"@ant-design/pro-field@1.18.4":
+"@ant-design/pro-field@1.18.4", "@ant-design/pro-field@^1.18.4":
   version "1.18.4"
   resolved "https://registry.yarnpkg.com/@ant-design/pro-field/-/pro-field-1.18.4.tgz#1454e53c0dc049ca3b089f3cedba31a54081dd80"
   integrity sha512-LyFnxK1gyeooTJk6+H3fxR/Oay1We1ikkX/e+PVmFndOjHtV/dvK0PUFXyoEDrZHgW3yMOrxsLpiVlW2JoX2JQ==

@@ -1,8 +1,8 @@
 import { useRef } from 'react';
-import { Button, message } from 'antd';
+import { Button, message, Row, Col } from 'antd';
 import provinceOptions from './city';
 import type { FormInstance } from 'antd';
-import { addBranch } from '@/api/index';
+import { addBranch, updateBranch } from '@/api/index';
 import type { BranchItem } from '@/api/index';
 import ProForm, {
   DrawerForm,
@@ -12,22 +12,24 @@ import ProForm, {
   ProFormTextArea,
 } from '@ant-design/pro-form';
 import { PlusOutlined } from '@ant-design/icons';
-
-const waitTime = (time: number = 100) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(true);
-    }, time);
-  });
+type Prop = {
+  visible: boolean;
+  initialValues?: BranchItem;
+  updateTable(): void;
+  updateVisible(visable: boolean): void;
+  mode: 'read' | 'edit';
 };
-
-export default (props) => {
-  const { onClose } = props;
+export default (props: Prop) => {
+  const { initialValues, visible, updateTable, updateVisible, mode } = props;
+  const readOnly = mode == 'read';
   const formRef = useRef<FormInstance>();
   return (
     <DrawerForm<BranchItem>
       title="新建网点"
       formRef={formRef}
+      visible={visible}
+      initialValues={initialValues}
+      onVisibleChange={(visible) => updateVisible(visible)}
       trigger={
         <Button type="primary">
           <PlusOutlined />
@@ -39,14 +41,20 @@ export default (props) => {
         destroyOnClose: true,
       }}
       onFinish={async (values) => {
-        const res = await addBranch(values);
+        console.log(values);
+        let res;
+        if (initialValues) {
+          res = await updateBranch({ ...initialValues, ...values });
+        } else {
+          res = await addBranch(values);
+        }
         if (res.code != 0) {
           message.error(res.error);
           return false;
         }
         message.success('提交成功');
         // 不返回不会关闭弹框
-        onClose();
+        updateTable();
         return true;
       }}
       onValuesChange={(_, values) => {
@@ -65,7 +73,12 @@ export default (props) => {
       }}
     >
       <ProForm.Group label="网点名称">
-        <ProFormText width="md" name="name" placeholder="请输入名称" />
+        <ProFormText
+          width="md"
+          name="name"
+          placeholder="请输入名称"
+          disabled={readOnly}
+        />
       </ProForm.Group>
       <ProForm.Group label="地址">
         <ProFormSelect
@@ -73,6 +86,7 @@ export default (props) => {
           width="sm"
           name="province"
           placeholder="请选择省"
+          disabled={readOnly}
         />
         <ProFormDependency name={['province']}>
           {({ province }) => {
@@ -87,6 +101,7 @@ export default (props) => {
                 width="sm"
                 name="city"
                 placeholder="请选择城市"
+                disabled={readOnly}
               />
             );
           }}
@@ -107,6 +122,7 @@ export default (props) => {
                 width="sm"
                 name="area"
                 placeholder="请选择地区"
+                disabled={readOnly}
               />
             );
           }}
@@ -115,6 +131,7 @@ export default (props) => {
           name="address"
           width="xl"
           placeholder="请输入详细地址"
+          disabled={readOnly}
         />
       </ProForm.Group>
       <ProForm.Group label="费用详细">
@@ -122,83 +139,54 @@ export default (props) => {
           name="range"
           width="xs"
           label="服务范围半径（单位：千米）"
+          disabled={readOnly}
         />
         <ProFormText
           name="base_cost"
           width="xs"
           label="基础服务费（单位：元）"
+          disabled={readOnly}
         />
         <ProFormText
           name="extra_range_unit_price"
           width="xs"
           label="超出服务范围收费（单位：千米/元）"
+          disabled={readOnly}
         />
       </ProForm.Group>
       <ProForm.Group label="备注">
-        <ProFormTextArea name="remark" width="xl" />
+        <ProFormTextArea name="remark" width="xl" disabled={readOnly} />
       </ProForm.Group>
-      {/* <ProForm.Group>
-        <ProFormText
-          name="name"
-          width="md"
-          label="签约客户名称"
-          tooltip="最长为 24 位"
-          placeholder="请输入名称"
-        />
-        <ProFormText
-          width="md"
-          name="company"
-          label="我方公司名称"
-          placeholder="请输入名称"
-        />
+      <ProForm.Group label="战士长">
+        <Row>
+          <Col span={24}>
+            <ProFormText
+              width="md"
+              name="warrior_manager_id"
+              label="请选择战士长"
+              disabled={readOnly}
+            />
+          </Col>
+          <Col span={24}>
+            <ProFormText
+              width="md"
+              name="contact_person"
+              label="网点联系人"
+              tooltip="根据选择的战士长自动填充"
+              disabled={readOnly}
+            />
+          </Col>
+          <Col span={24}>
+            <ProFormText
+              width="md"
+              name="contact_phone"
+              label="网点联系电话"
+              tooltip="根据选择的战士长自动填充"
+              disabled={readOnly}
+            />
+          </Col>
+        </Row>
       </ProForm.Group>
-      <ProForm.Group>
-        <ProFormText
-          width="md"
-          name="contract"
-          label="合同名称"
-          placeholder="请输入名称"
-        />
-        <ProFormDateRangePicker name="contractTime" label="合同生效时间" />
-      </ProForm.Group>
-      <ProForm.Group>
-        <ProFormSelect
-          options={[
-            {
-              value: 'chapter',
-              label: '盖章后生效',
-            },
-          ]}
-          width="xs"
-          name="useMode"
-          label="合同约定生效方式"
-        />
-        <ProFormSelect
-          width="xs"
-          options={[
-            {
-              value: 'time',
-              label: '履行完终止',
-            },
-          ]}
-          name="unusedMode"
-          label="合同约定失效效方式"
-        />
-      </ProForm.Group>
-      <ProFormText width="sm" name="id" label="主合同编号" />
-      <ProFormText
-        name="project"
-        disabled
-        label="项目名称"
-        initialValue="xxxx项目"
-      />
-      <ProFormText
-        width="xs"
-        name="mangerName"
-        disabled
-        label="商务经理"
-        initialValue="启途"
-      /> */}
     </DrawerForm>
   );
 };

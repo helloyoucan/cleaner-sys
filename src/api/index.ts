@@ -34,3 +34,17 @@ export const addBranch = (data: BranchItem) =>
     url: '/api/system/branch',
     data,
   });
+export const updateBranch = (data: BranchItem) =>
+  request<APIResponse<null>>({
+    method: 'put',
+    url: '/api/system/branch',
+    data,
+  });
+export const deleteBranch = (id: string) =>
+  request<APIResponse<null>>({
+    method: 'delete',
+    url: '/api/system/branch',
+    params: {
+      id,
+    },
+  });
