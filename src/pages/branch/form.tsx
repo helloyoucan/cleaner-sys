@@ -41,7 +41,6 @@ export default (props: Prop) => {
         destroyOnClose: true,
       }}
       onFinish={async (values) => {
-        console.log(values);
         let res;
         if (initialValues) {
           res = await updateBranch({ ...initialValues, ...values });

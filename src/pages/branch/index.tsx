@@ -117,6 +117,7 @@ export default () => {
         <a
           key="link"
           onClick={() => {
+            setFormData(record);
             setFormMode('read');
             setDrawerVisible(true);
           }}
@@ -137,7 +138,7 @@ export default () => {
           title="删除这条数据?"
           placement="left"
           onConfirm={async () => {
-            const res = await deleteBranch(id as string);
+            const res = await deleteBranch(record?.id || '');
             if (res.code != 0) return message.error(res.error);
             message.success('删除成功');
             ref?.current?.submit();
@@ -215,7 +216,10 @@ export default () => {
           initialValues={formData}
           updateVisible={(visible) => {
             setDrawerVisible(visible);
-            !visible && setFormMode('edit');
+            if (!visible) {
+              setFormData(undefined);
+              setFormMode('edit');
+            }
           }}
           updateTable={() => ref?.current?.submit()}
         ></Form>,
