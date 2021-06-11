@@ -27,8 +27,17 @@ function yuan2fen(fen: number): number {
 function fen2yuan(yuan: number): number {
   return yuan / 100;
 }
+/**
+ * 时间格式转时间戳
+ * @param dateTime
+ */
+function dateTime2time(dateTime?: string) {
+  if (!dateTime) return dateTime;
+  return new Date(dateTime).getTime();
+}
 export default {
   array2Query,
   yuan2fen,
   fen2yuan,
+  dateTime2time,
 };

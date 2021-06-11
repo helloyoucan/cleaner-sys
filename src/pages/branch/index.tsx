@@ -1,25 +1,23 @@
-import styles from './index.less';
 import { useRef, useState } from 'react';
 import { getBranch, deleteBranch } from '@/api/index';
 import type { BranchItem } from '@/api/index';
 import cityOptions from './city';
-import {
-  Button,
-  Tooltip,
-  Input,
-  Space,
-  Table,
-  Cascader,
-  Popconfirm,
-  message,
-} from 'antd';
+import { Space, Cascader, Popconfirm, message } from 'antd';
 import type { FormInstance } from 'antd';
-import { QuestionCircleOutlined, SearchOutlined } from '@ant-design/icons';
-import type { ProColumns } from '@ant-design/pro-table';
-import ProTable, { TableDropdown } from '@ant-design/pro-table';
+import type { ProColumns, ProTableProps } from '@ant-design/pro-table';
+import ProTable from '@ant-design/pro-table';
 import { EnumBranchStatus } from '@/enum/index';
 import Form from './form';
 import utils from '@/utils/util';
+type FormQueryType = {
+  contact_person?: string;
+  created?: string[];
+  current?: number;
+  name?: string;
+  pageSize?: number;
+  province?: string[];
+  status?: string;
+};
 export default () => {
   const ref = useRef<FormInstance>();
   const [drawerVisible, setDrawerVisible] = useState(false);
@@ -38,9 +36,9 @@ export default () => {
     },
     {
       title: '地区',
-      dataIndex: 'address',
+      dataIndex: 'province',
       render: (_, record: BranchItem) => {
-        const { province, city, area, address } = record;
+        const { province, city, area } = record;
         return `${province || '-'}/${city || '-'}/${area || '-'}`;
       },
       renderFormItem: (_, { onChange, value }, form) => {
@@ -83,7 +81,6 @@ export default () => {
     {
       title: '状态',
       dataIndex: 'status',
-      initialValue: 0,
       filters: true,
       onFilter: true,
       valueEnum: {
@@ -96,7 +93,7 @@ export default () => {
       title: '创建时间',
       width: 140,
       dataIndex: 'created',
-      valueType: 'date',
+      valueType: 'dateTimeRange',
       sorter: (a, b) => a.created - b.created,
     },
     {
@@ -150,7 +147,7 @@ export default () => {
     },
   ];
   return (
-    <ProTable<BranchItem>
+    <ProTable<BranchItem, FormQueryType>
       formRef={ref}
       columns={columns}
       rowSelection={{}}
@@ -194,6 +191,14 @@ export default () => {
         return getBranch({
           page: params.current,
           page_size: params.pageSize,
+          name: params.name,
+          province: params.province?.[0],
+          city: params.province?.[1],
+          area: params.province?.[2],
+          contact_person: params.contact_person,
+          status: params.status,
+          created_start_time: utils.dateTime2time(params.created?.[0]),
+          created_end_time: utils.dateTime2time(params.created?.[1]),
         }).then((res) => {
           if (res.code != 0) {
             return {

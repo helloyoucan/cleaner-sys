@@ -19,13 +19,14 @@ export type BranchItem = {
   remark: string;
   created: number;
 };
-export const getBranch = ({ page = 1, page_size = 10 }) =>
+export const getBranch = ({ page = 1, page_size = 10, ...query }) =>
   request<APIResponse<BranchItem[]>>({
     method: 'get',
     url: '/api/system/branch/pages',
     params: {
       page,
       page_size,
+      ...query,
     },
   });
 
