@@ -213,34 +213,26 @@ export default (props: Prop) => {
         />
       </ProForm.Group>
       <ProForm.Group label="战士长">
-        <Row>
-          <Col span={24}>
-            <ProFormText
-              width="md"
-              name="warrior_manager_id"
-              label="请选择战士长"
-              readonly={readOnly}
-            />
-          </Col>
-          <Col span={12}>
-            <ProFormText
-              width="md"
-              name="contact_person"
-              label="网点联系人"
-              tooltip="根据选择的战士长自动填充"
-              readonly={readOnly}
-            />
-          </Col>
-          <Col span={12}>
-            <ProFormText
-              width="md"
-              name="contact_phone"
-              label="网点联系电话"
-              tooltip="根据选择的战士长自动填充"
-              readonly={readOnly}
-            />
-          </Col>
-        </Row>
+        <ProFormText
+          width="sm"
+          name="warrior_manager_id"
+          label="请选择战士长"
+          readonly={readOnly}
+        />
+        <ProFormText
+          width="xs"
+          name="contact_person"
+          label="网点联系人"
+          tooltip="根据选择的战士长自动填充"
+          readonly={readOnly}
+        />
+        <ProFormText
+          width="sm"
+          name="contact_phone"
+          label="网点联系电话"
+          tooltip="根据选择的战士长自动填充"
+          readonly={readOnly}
+        />
       </ProForm.Group>
     </DrawerForm>
   );
