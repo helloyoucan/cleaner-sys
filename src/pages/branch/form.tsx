@@ -12,6 +12,8 @@ import ProForm, {
   ProFormTextArea,
 } from '@ant-design/pro-form';
 import { PlusOutlined } from '@ant-design/icons';
+import { EnumBranchStatus } from '@/enum';
+import utils from '@/utils/util';
 type Prop = {
   visible: boolean;
   initialValues?: BranchItem;
@@ -25,10 +27,20 @@ export default (props: Prop) => {
   const formRef = useRef<FormInstance>();
   return (
     <DrawerForm<BranchItem>
-      title="新建网点"
+      title={(readOnly ? '查看' : initialValues ? '修改' : '新增') + '网点'}
       formRef={formRef}
       visible={visible}
-      initialValues={initialValues}
+      initialValues={
+        initialValues
+          ? {
+              ...initialValues,
+              base_cost: utils.fen2yuan(initialValues.base_cost),
+              extra_range_unit_price: utils.fen2yuan(
+                initialValues.extra_range_unit_price,
+              ),
+            }
+          : initialValues
+      }
       onVisibleChange={(visible) => updateVisible(visible)}
       trigger={
         <Button type="primary">
@@ -40,8 +52,15 @@ export default (props: Prop) => {
         forceRender: false,
         destroyOnClose: true,
       }}
-      onFinish={async (values) => {
+      onFinish={async (_values) => {
         let res;
+        const values = {
+          ..._values,
+          base_cost: utils.yuan2fen(_values.base_cost),
+          extra_range_unit_price: utils.yuan2fen(
+            _values.extra_range_unit_price,
+          ),
+        };
         if (initialValues) {
           res = await updateBranch({ ...initialValues, ...values });
         } else {
@@ -72,14 +91,25 @@ export default (props: Prop) => {
       }}
     >
       <ProForm.Group label="网点名称">
-        <ProFormText
-          width="md"
-          name="name"
-          placeholder="请输入名称"
-          disabled={readOnly}
-        />
+        <ProFormText width="md" name="name" readonly={readOnly} />
       </ProForm.Group>
       <ProForm.Group label="地址">
+        {initialValues && readOnly && (
+          <>
+            <ProFormText
+              width="xl"
+              label="经度"
+              name="longitude"
+              readonly={true}
+            />
+            <ProFormText
+              width="xl"
+              label="纬度"
+              name="latitude"
+              readonly={true}
+            />
+          </>
+        )}
         <ProFormSelect
           options={provinceOptions}
           width="sm"
@@ -90,7 +120,7 @@ export default (props: Prop) => {
               return item.value;
             },
           }}
-          disabled={readOnly}
+          readonly={readOnly}
         />
         <ProFormDependency name={['province']}>
           {({ province }) => {
@@ -105,7 +135,7 @@ export default (props: Prop) => {
                 width="sm"
                 name="city"
                 placeholder="请选择城市"
-                disabled={readOnly}
+                readonly={readOnly}
               />
             );
           }}
@@ -126,7 +156,7 @@ export default (props: Prop) => {
                 width="sm"
                 name="area"
                 placeholder="请选择地区"
-                disabled={readOnly}
+                readonly={readOnly}
               />
             );
           }}
@@ -135,7 +165,7 @@ export default (props: Prop) => {
           name="address"
           width="xl"
           placeholder="请输入详细地址"
-          disabled={readOnly}
+          readonly={readOnly}
         />
       </ProForm.Group>
       <ProForm.Group label="费用详细">
@@ -143,23 +173,44 @@ export default (props: Prop) => {
           name="range"
           width="xs"
           label="服务范围半径（单位：千米）"
-          disabled={readOnly}
+          readonly={readOnly}
         />
         <ProFormText
           name="base_cost"
           width="xs"
           label="基础服务费（单位：元）"
-          disabled={readOnly}
+          readonly={readOnly}
         />
         <ProFormText
           name="extra_range_unit_price"
           width="xs"
           label="超出服务范围收费（单位：千米/元）"
-          disabled={readOnly}
+          readonly={readOnly}
         />
       </ProForm.Group>
       <ProForm.Group label="备注">
-        <ProFormTextArea name="remark" width="xl" disabled={readOnly} />
+        <ProFormTextArea name="remark" width="xl" readonly={readOnly} />
+      </ProForm.Group>
+      <ProForm.Group label="网点状态">
+        <ProFormSelect
+          options={[
+            {
+              value: EnumBranchStatus.close,
+              label: '关闭',
+            },
+            {
+              value: EnumBranchStatus.open,
+              label: '营业中',
+            },
+            {
+              value: EnumBranchStatus.rest,
+              label: '休息中',
+            },
+          ]}
+          width="sm"
+          name="status"
+          readonly={readOnly}
+        />
       </ProForm.Group>
       <ProForm.Group label="战士长">
         <Row>
@@ -168,25 +219,25 @@ export default (props: Prop) => {
               width="md"
               name="warrior_manager_id"
               label="请选择战士长"
-              disabled={readOnly}
+              readonly={readOnly}
             />
           </Col>
-          <Col span={24}>
+          <Col span={12}>
             <ProFormText
               width="md"
               name="contact_person"
               label="网点联系人"
               tooltip="根据选择的战士长自动填充"
-              disabled={readOnly}
+              readonly={readOnly}
             />
           </Col>
-          <Col span={24}>
+          <Col span={12}>
             <ProFormText
               width="md"
               name="contact_phone"
               label="网点联系电话"
               tooltip="根据选择的战士长自动填充"
-              disabled={readOnly}
+              readonly={readOnly}
             />
           </Col>
         </Row>

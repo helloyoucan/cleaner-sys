@@ -17,8 +17,9 @@ import type { FormInstance } from 'antd';
 import { QuestionCircleOutlined, SearchOutlined } from '@ant-design/icons';
 import type { ProColumns } from '@ant-design/pro-table';
 import ProTable, { TableDropdown } from '@ant-design/pro-table';
+import { EnumBranchStatus } from '@/enum/index';
 import Form from './form';
-
+import utils from '@/utils/util';
 export default () => {
   const ref = useRef<FormInstance>();
   const [drawerVisible, setDrawerVisible] = useState(false);
@@ -40,9 +41,7 @@ export default () => {
       dataIndex: 'address',
       render: (_, record: BranchItem) => {
         const { province, city, area, address } = record;
-        return `${province || '-'}/${city || '-'}/${area || '-'}/${
-          address || '-'
-        }`;
+        return `${province || '-'}/${city || '-'}/${area || '-'}`;
       },
       renderFormItem: (_, { onChange, value }, form) => {
         return (
@@ -65,33 +64,32 @@ export default () => {
       renderFormItem: () => false,
     },
     {
-      title: '服务范围',
+      title: '服务范围（米）',
       dataIndex: 'range',
-      render: (_) => _ + '米',
       renderFormItem: () => false,
     },
     {
-      title: '基础费用',
+      title: '基础费用（元）',
       dataIndex: 'base_cost',
-      render: (_) => _ + '元',
+      render: (_, entity) => utils.fen2yuan(entity.base_cost),
       renderFormItem: () => false,
     },
     {
-      title: '超出范围的单价',
+      title: '超出范围的单价(元/千米)',
       dataIndex: 'extra_range_unit_price',
-      render: (_) => _ + '元/km',
+      render: (_, entity) => utils.fen2yuan(entity.extra_range_unit_price),
       renderFormItem: () => false,
     },
     {
       title: '状态',
       dataIndex: 'status',
-      initialValue: 1,
+      initialValue: 0,
       filters: true,
       onFilter: true,
       valueEnum: {
-        1: { text: '营业中', status: 'Default' },
-        2: { text: '休息中', status: 'Default' },
-        3: { text: '关闭', status: 'Processing' },
+        [EnumBranchStatus.close]: { text: '关闭', status: 'Error' },
+        [EnumBranchStatus.open]: { text: '营业中', status: 'Success' },
+        [EnumBranchStatus.rest]: { text: '休息中', status: 'Default' },
       },
     },
     {
@@ -138,7 +136,7 @@ export default () => {
           title="删除这条数据?"
           placement="left"
           onConfirm={async () => {
-            const res = await deleteBranch(record?.id || '');
+            const res = await deleteBranch([record?.id || '']);
             if (res.code != 0) return message.error(res.error);
             message.success('删除成功');
             ref?.current?.submit();
@@ -170,10 +168,24 @@ export default () => {
           </span>
         </Space>
       )}
-      tableAlertOptionRender={() => {
+      tableAlertOptionRender={({ selectedRowKeys }) => {
         return (
           <Space size={16}>
-            <a>批量删除</a>
+            <Popconfirm
+              key="link3"
+              title={`删除选中的${selectedRowKeys.length}条数据?`}
+              placement="left"
+              onConfirm={async () => {
+                const res = await deleteBranch(selectedRowKeys);
+                if (res.code != 0) return message.error(res.error);
+                message.success(`${res.data}条删除成功`);
+                ref?.current?.submit();
+              }}
+              okText="确定"
+              cancelText="取消"
+            >
+              <a>批量删除</a>
+            </Popconfirm>
           </Space>
         );
       }}

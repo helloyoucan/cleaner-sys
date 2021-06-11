@@ -1,4 +1,5 @@
-import request from '../utils/request';
+import request from '@/utils/request';
+import utils from '@/utils/util';
 export type BranchItem = {
   id?: string;
   name: string;
@@ -40,11 +41,8 @@ export const updateBranch = (data: BranchItem) =>
     url: '/api/system/branch',
     data,
   });
-export const deleteBranch = (id: string) =>
-  request<APIResponse<null>>({
+export const deleteBranch = (ids: (string | number)[]) =>
+  request<APIResponse<number>>({
     method: 'delete',
-    url: '/api/system/branch',
-    params: {
-      id,
-    },
+    url: '/api/system/branch?' + utils.array2Query(ids, 'id'),
   });
