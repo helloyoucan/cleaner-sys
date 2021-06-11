@@ -10,6 +10,7 @@ import ProForm, {
   ProFormSelect,
   ProFormDependency,
   ProFormTextArea,
+  ProFormDigit,
 } from '@ant-design/pro-form';
 import { PlusOutlined } from '@ant-design/icons';
 import { EnumBranchStatus } from '@/enum';
@@ -75,7 +76,7 @@ export default (props: Prop) => {
         updateTable();
         return true;
       }}
-      onValuesChange={(_, values) => {
+      onValuesChange={(value: BranchItem, values) => {
         // 省/市 清除选择的值的的联动
         if (!values.province) {
           formRef?.current?.setFieldsValue({
@@ -88,10 +89,32 @@ export default (props: Prop) => {
             area: null,
           });
         }
+        if (value.range) {
+          formRef?.current?.setFieldsValue({
+            range: +value.range.toString().replace(/\D/g, ''),
+          });
+        }
+        if (value.base_cost) {
+          formRef?.current?.setFieldsValue({
+            base_cost: +value.base_cost.toString().replace(/\D/g, ''),
+          });
+        }
+        if (value.extra_range_unit_price) {
+          formRef?.current?.setFieldsValue({
+            extra_range_unit_price: +value.extra_range_unit_price
+              .toString()
+              .replace(/\D/g, ''),
+          });
+        }
       }}
     >
       <ProForm.Group label="网点名称">
-        <ProFormText width="md" name="name" readonly={readOnly} />
+        <ProFormText
+          width="md"
+          name="name"
+          readonly={readOnly}
+          rules={[{ required: true, message: '请输入网点名称' }]}
+        />
       </ProForm.Group>
       <ProForm.Group label="地址">
         {initialValues && readOnly && (
@@ -114,7 +137,8 @@ export default (props: Prop) => {
           options={provinceOptions}
           width="sm"
           name="province"
-          placeholder="请选择省"
+          placeholder="请选择省/市"
+          rules={[{ required: true, message: '请选择省' }]}
           fieldProps={{
             optionItemRender(item) {
               return item.value;
@@ -134,7 +158,8 @@ export default (props: Prop) => {
                 options={cityOptions}
                 width="sm"
                 name="city"
-                placeholder="请选择城市"
+                placeholder="请选择市/区"
+                rules={[{ required: true, message: '请选择市' }]}
                 readonly={readOnly}
               />
             );
@@ -155,7 +180,8 @@ export default (props: Prop) => {
                 options={areaOptions}
                 width="sm"
                 name="area"
-                placeholder="请选择地区"
+                placeholder="请选择区"
+                rules={[{ required: true, message: '请选择区' }]}
                 readonly={readOnly}
               />
             );
@@ -164,7 +190,8 @@ export default (props: Prop) => {
         <ProFormTextArea
           name="address"
           width="xl"
-          placeholder="请输入详细地址"
+          placeholder="详细地址"
+          rules={[{ required: true, message: '请输入详细地址' }]}
           readonly={readOnly}
         />
       </ProForm.Group>
@@ -173,18 +200,36 @@ export default (props: Prop) => {
           name="range"
           width="xs"
           label="服务范围半径（单位：千米）"
+          rules={[
+            {
+              required: true,
+              message: '请输入正确的服务范围半径',
+            },
+          ]}
           readonly={readOnly}
         />
         <ProFormText
           name="base_cost"
           width="xs"
           label="基础服务费（单位：元）"
+          rules={[
+            {
+              required: true,
+              message: '请输入正确的基础服务费',
+            },
+          ]}
           readonly={readOnly}
         />
         <ProFormText
           name="extra_range_unit_price"
           width="xs"
           label="超出服务范围收费（单位：千米/元）"
+          rules={[
+            {
+              required: true,
+              message: '请输入正确的超出服务范围收费',
+            },
+          ]}
           readonly={readOnly}
         />
       </ProForm.Group>
@@ -193,6 +238,7 @@ export default (props: Prop) => {
       </ProForm.Group>
       <ProForm.Group label="网点状态">
         <ProFormSelect
+          initialValue={initialValues ? undefined : 0}
           options={[
             {
               value: EnumBranchStatus.close,
