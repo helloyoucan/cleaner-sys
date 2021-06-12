@@ -95,6 +95,7 @@ export default () => {
       dataIndex: 'created',
       valueType: 'dateTimeRange',
       sorter: (a, b) => a.created - b.created,
+      render: (_, entity) => new Date(entity.created).toLocaleString(),
     },
     {
       title: '备注',
@@ -165,7 +166,7 @@ export default () => {
           </span>
         </Space>
       )}
-      tableAlertOptionRender={({ selectedRowKeys }) => {
+      tableAlertOptionRender={({ selectedRowKeys, onCleanSelected }) => {
         return (
           <Space size={16}>
             <Popconfirm
@@ -177,6 +178,7 @@ export default () => {
                 if (res.code != 0) return message.error(res.error);
                 message.success(`${res.data}条删除成功`);
                 ref?.current?.submit();
+                onCleanSelected();
               }}
               okText="确定"
               cancelText="取消"
