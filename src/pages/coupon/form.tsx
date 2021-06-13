@@ -65,9 +65,6 @@ export default (props: Prop) => {
         updateTable();
         return true;
       }}
-      onValuesChange={(value: CouponItem, values) => {
-        // 省/市 清除选择的值的的联动
-      }}
     >
       <ProForm.Group label="优惠券名称">
         <ProFormText
