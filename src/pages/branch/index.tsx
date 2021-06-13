@@ -3,8 +3,7 @@ import { getBranch, deleteBranch } from '@/api/index';
 import type { BranchItem } from '@/api/index';
 import cityOptions from './city';
 import { Space, Cascader, Popconfirm, message } from 'antd';
-import type { FormInstance } from 'antd';
-import type { ProColumns, ProTableProps } from '@ant-design/pro-table';
+import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import { EnumBranchStatus } from '@/enum/index';
 import Form from './form';
@@ -19,7 +18,7 @@ type FormQueryType = {
   status?: string;
 };
 export default () => {
-  const ref = useRef<FormInstance>();
+  const ref = useRef<ActionType>();
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [formData, setFormData] = useState<BranchItem | undefined>();
   const [formMode, setFormMode] = useState<'read' | 'edit'>('edit');
@@ -31,7 +30,7 @@ export default () => {
       width: 48,
     },
     {
-      title: '网店点名称',
+      title: '网点名称',
       dataIndex: 'name',
     },
     {
@@ -137,7 +136,7 @@ export default () => {
             const res = await deleteBranch([record?.id || '']);
             if (res.code != 0) return message.error(res.error);
             message.success('删除成功');
-            ref?.current?.submit();
+            ref?.current?.reload();
           }}
           okText="确定"
           cancelText="取消"
@@ -149,7 +148,7 @@ export default () => {
   ];
   return (
     <ProTable<BranchItem, FormQueryType>
-      formRef={ref}
+      actionRef={ref}
       columns={columns}
       rowSelection={{}}
       tableAlertRender={({
@@ -177,7 +176,7 @@ export default () => {
                 const res = await deleteBranch(selectedRowKeys);
                 if (res.code != 0) return message.error(res.error);
                 message.success(`${res.data}条删除成功`);
-                ref?.current?.submit();
+                ref?.current?.reload();
                 onCleanSelected();
               }}
               okText="确定"
@@ -240,7 +239,7 @@ export default () => {
               setFormMode('edit');
             }
           }}
-          updateTable={() => ref?.current?.submit()}
+          updateTable={() => ref?.current?.reload()}
         ></Form>,
       ]}
     />

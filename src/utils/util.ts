@@ -31,8 +31,8 @@ function fen2yuan(yuan: number): number {
  * 时间格式转时间戳
  * @param dateTime
  */
-function dateTime2time(dateTime?: string) {
-  if (!dateTime) return dateTime;
+function dateTime2time(dateTime?: string): number {
+  if (!dateTime) return 0;
   return new Date(dateTime).getTime();
 }
 export default {
