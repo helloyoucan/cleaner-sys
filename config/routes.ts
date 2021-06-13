@@ -1,5 +1,5 @@
 const routes = [
-  { exact: true, path: '/branch', component: 'branch/index', name: '网点' },
+  { exact: true, path: '/branch', component: 'branch/index', name: '网店' },
   { exact: true, path: '/coupon', component: 'coupon/index', name: '优惠券' },
   {
     exact: true,
