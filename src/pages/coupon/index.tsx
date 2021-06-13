@@ -67,8 +67,8 @@ export default () => {
       render: (_, entity) => new Date(entity.created).toLocaleString(),
     },
     {
-      title: '备注',
-      dataIndex: 'remark',
+      title: '描述',
+      dataIndex: 'description',
       ellipsis: true,
       // copyable: true,
       renderFormItem: () => false,

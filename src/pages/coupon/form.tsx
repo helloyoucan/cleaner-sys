@@ -103,8 +103,8 @@ export default (props: Prop) => {
           readonly={readOnly}
         />
       </ProForm.Group>
-      <ProForm.Group label="备注">
-        <ProFormTextArea name="remark" width="xl" readonly={readOnly} />
+      <ProForm.Group label="描述">
+        <ProFormTextArea name="description" width="xl" readonly={readOnly} />
       </ProForm.Group>
     </DrawerForm>
   );
