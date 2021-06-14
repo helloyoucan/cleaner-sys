@@ -1,6 +1,6 @@
 import request from '@/utils/request';
 import utils from '@/utils/util';
-// 网店
+// 网点
 export type BranchItem = {
   id?: string;
   name: string;
@@ -54,7 +54,7 @@ export type CouponItem = {
   name: string;
   start_time: number;
   end_time: number;
-  remark: string;
+  description: string;
   created: number;
 };
 export const getCoupon = ({ page = 1, page_size = 10, ...query }) =>
@@ -84,4 +84,42 @@ export const deleteCoupon = (ids: (string | number)[]) =>
   request<APIResponse<number>>({
     method: 'delete',
     url: '/api/system/coupon?' + utils.array2Query(ids, 'id'),
+  });
+
+export type ExtraServiceItem = {
+  id?: string;
+  name: string;
+  unit_price: number;
+  discount: number;
+  description: string;
+  status: number;
+  created: number;
+};
+export const getExtraService = ({ page = 1, page_size = 10, ...query }) =>
+  request<APIResponse<ExtraServiceItem[]>>({
+    method: 'get',
+    url: '/api/system/extraService/pages',
+    params: {
+      page,
+      page_size,
+      ...query,
+    },
+  });
+
+export const addExtraService = (data: ExtraServiceItem) =>
+  request<APIResponse<null>>({
+    method: 'post',
+    url: '/api/system/extraService',
+    data,
+  });
+export const updateExtraService = (data: ExtraServiceItem) =>
+  request<APIResponse<null>>({
+    method: 'put',
+    url: '/api/system/extraService',
+    data,
+  });
+export const deleteExtraService = (ids: (string | number)[]) =>
+  request<APIResponse<number>>({
+    method: 'delete',
+    url: '/api/system/extraService?' + utils.array2Query(ids, 'id'),
   });
