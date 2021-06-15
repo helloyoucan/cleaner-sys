@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { getBranch, deleteBranch } from '@/api/index';
 import type { BranchItem } from '@/api/index';
-import cityOptions from './city';
+import provinceOptions from '@/utils/city';
 import { Space, Cascader, Popconfirm, message } from 'antd';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
@@ -43,7 +43,7 @@ export default () => {
       renderFormItem: (_, { onChange, value }, form) => {
         return (
           <Cascader
-            options={cityOptions}
+            options={provinceOptions}
             onChange={onChange}
             value={value}
             placeholder="选择地区"

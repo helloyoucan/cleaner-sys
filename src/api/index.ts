@@ -1,5 +1,6 @@
 import request from '@/utils/request';
 import utils from '@/utils/util';
+export const uploadPath = '/api/system/upload';
 // 网点
 export type BranchItem = {
   id?: string;
@@ -30,7 +31,11 @@ export const getBranch = ({ page = 1, page_size = 10, ...query }) =>
       ...query,
     },
   });
-
+export const getAllBranch = () =>
+  request<APIResponse<BranchItem[]>>({
+    method: 'get',
+    url: '/api/system/branch',
+  });
 export const addBranch = (data: BranchItem) =>
   request<APIResponse<null>>({
     method: 'post',
@@ -86,6 +91,7 @@ export const deleteCoupon = (ids: (string | number)[]) =>
     url: '/api/system/coupon?' + utils.array2Query(ids, 'id'),
   });
 
+// 附加服务
 export type ExtraServiceItem = {
   id?: string;
   name: string;
@@ -122,4 +128,56 @@ export const deleteExtraService = (ids: (string | number)[]) =>
   request<APIResponse<number>>({
     method: 'delete',
     url: '/api/system/extraService?' + utils.array2Query(ids, 'id'),
+  });
+
+//战士
+export type WarriorItem = {
+  id?: string;
+  name: string;
+  phone: number;
+  age: number;
+  sex: number;
+  join_time: number;
+  belong_branch_id: string;
+  status: number;
+  id_card: string;
+  id_card_image_front: string;
+  id_card_image_behind: string;
+  domicile_province: string;
+  domicile_city: string;
+  domicile_area: string;
+  province: string;
+  city: string;
+  area: string;
+  address: string;
+  remark: string;
+  created: number;
+};
+export const getWarrior = ({ page = 1, page_size = 10, ...query }) =>
+  request<APIResponse<WarriorItem[]>>({
+    method: 'get',
+    url: '/api/system/warrior/pages',
+    params: {
+      page,
+      page_size,
+      ...query,
+    },
+  });
+
+export const addWarrior = (data: WarriorItem) =>
+  request<APIResponse<null>>({
+    method: 'post',
+    url: '/api/system/warrior',
+    data,
+  });
+export const updateWarrior = (data: WarriorItem) =>
+  request<APIResponse<null>>({
+    method: 'put',
+    url: '/api/system/warrior',
+    data,
+  });
+export const deleteWarrior = (ids: (string | number)[]) =>
+  request<APIResponse<number>>({
+    method: 'delete',
+    url: '/api/system/warrior?' + utils.array2Query(ids, 'id'),
   });

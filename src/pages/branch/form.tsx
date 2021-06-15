@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import { Button, message } from 'antd';
-import provinceOptions from './city';
+import provinceOptions from '@/utils/city';
 import type { FormInstance } from 'antd';
 import { addBranch, updateBranch } from '@/api/index';
 import type { BranchItem } from '@/api/index';
