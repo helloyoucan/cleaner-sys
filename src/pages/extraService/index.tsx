@@ -13,7 +13,8 @@ type FormQueryType = {
   name?: string;
   pageSize?: number;
   unit_price?: string;
-  discount?: string;
+  discount?: number;
+  status?: number;
 };
 export default () => {
   const ref = useRef<ActionType>();
@@ -30,6 +31,11 @@ export default () => {
     {
       title: '附加服务名称',
       dataIndex: 'name',
+      formItemProps: {
+        labelCol: {
+          md: 8,
+        },
+      },
     },
     {
       title: '单价（元）',
@@ -156,6 +162,8 @@ export default () => {
           page: params.current,
           page_size: params.pageSize,
           name: params.name,
+          discount: params.discount,
+          status: params.status,
           created_start_time: utils.dateTime2time(params.created?.[0]),
           created_end_time: utils.dateTime2time(params.created?.[1]),
         }).then((res) => {
@@ -182,7 +190,7 @@ export default () => {
       }}
       dateFormatter="string"
       toolbar={{
-        title: '优惠券',
+        title: '附加服务',
       }}
       options={{ fullScreen: true }}
       toolBarRender={() => [

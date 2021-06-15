@@ -88,23 +88,6 @@ export default (props: Prop) => {
             area: null,
           });
         }
-        if (value.range) {
-          formRef?.current?.setFieldsValue({
-            range: +value.range.toString().replace(/\D/g, ''),
-          });
-        }
-        if (value.base_cost) {
-          formRef?.current?.setFieldsValue({
-            base_cost: +value.base_cost.toString().replace(/\D/g, ''),
-          });
-        }
-        if (value.extra_range_unit_price) {
-          formRef?.current?.setFieldsValue({
-            extra_range_unit_price: +value.extra_range_unit_price
-              .toString()
-              .replace(/\D/g, ''),
-          });
-        }
       }}
     >
       <ProForm.Group label="网点名称">
@@ -199,10 +182,17 @@ export default (props: Prop) => {
           name="range"
           width="xs"
           label="服务范围半径（单位：千米）"
+          required
           rules={[
             {
-              required: true,
-              message: '请输入正确的服务范围半径',
+              validator: async (_, value) => {
+                if (!value || value.length == 0) {
+                  throw new Error('请输入服务范围半径');
+                }
+                if (isNaN(value)) {
+                  throw new Error('请输入正确的服务范围半径');
+                }
+              },
             },
           ]}
           readonly={readOnly}
@@ -211,10 +201,17 @@ export default (props: Prop) => {
           name="base_cost"
           width="xs"
           label="基础服务费（单位：元）"
+          required
           rules={[
             {
-              required: true,
-              message: '请输入正确的基础服务费',
+              validator: async (_, value) => {
+                if (!value || value.length == 0) {
+                  throw new Error('请输入基础服务费');
+                }
+                if (isNaN(value)) {
+                  throw new Error('请输入正确的基础服务费');
+                }
+              },
             },
           ]}
           readonly={readOnly}
@@ -223,10 +220,17 @@ export default (props: Prop) => {
           name="extra_range_unit_price"
           width="xs"
           label="超出服务范围收费（单位：千米/元）"
+          required
           rules={[
             {
-              required: true,
-              message: '请输入正确的超出服务范围收费',
+              validator: async (_, value) => {
+                if (!value || value.length == 0) {
+                  throw new Error('请输入超出服务范围收费');
+                }
+                if (isNaN(value)) {
+                  throw new Error('请输入正确的超出服务范围收费');
+                }
+              },
             },
           ]}
           readonly={readOnly}

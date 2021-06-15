@@ -12,13 +12,16 @@ import ProForm, {
 import { PlusOutlined } from '@ant-design/icons';
 import { EnumExtraServiceStatus } from '@/enum/index';
 import { debounce } from 'lodash';
-import util from '@/utils/util';
+import utils from '@/utils/util';
 type Prop = {
   visible: boolean;
   initialValues?: ExtraServiceItem;
   updateTable(): void;
   updateVisible(visable: boolean): void;
   mode: 'read' | 'edit';
+};
+const DefaultinitialValues = {
+  discount: 100,
 };
 export default (props: Prop) => {
   const { initialValues, visible, updateTable, updateVisible, mode } = props;
@@ -34,7 +37,14 @@ export default (props: Prop) => {
       title={(readOnly ? '查看' : initialValues ? '修改' : '新增') + '附加服务'}
       formRef={formRef}
       visible={visible}
-      initialValues={initialValues}
+      initialValues={
+        initialValues
+          ? {
+              ...initialValues,
+              unit_price: utils.fen2yuan(initialValues.unit_price),
+            }
+          : DefaultinitialValues
+      }
       onVisibleChange={(visible) => updateVisible(visible)}
       trigger={
         <Button type="primary">
@@ -50,6 +60,8 @@ export default (props: Prop) => {
         let res;
         const values: ExtraServiceItem = {
           ..._values,
+          unit_price: utils.yuan2fen(_values.unit_price),
+          discount: +_values.discount,
         };
         if (initialValues) {
           res = await updateExtraService({ ...initialValues, ...values });
@@ -65,17 +77,7 @@ export default (props: Prop) => {
         updateTable();
         return true;
       }}
-      onValuesChange={(value: ExtraServiceItem, values) => {
-        if (value.unit_price) {
-          //todo
-          // debounce(() => {
-          //   console.log(value, values)
-          //   formRef?.current?.setFieldsValue({
-          //     unit_price: +value.unit_price.toString().replace(/[^(\d|\.)]/g, ''),
-          //   });
-          // }, 200,{trailing:true})
-        }
-      }}
+      onValuesChange={(value: ExtraServiceItem, values) => {}}
     >
       <ProForm.Group label="附加服务名称">
         <ProFormText
@@ -85,15 +87,22 @@ export default (props: Prop) => {
           rules={[{ required: true, message: '请输入附加服务名称' }]}
         />
       </ProForm.Group>
-      <ProForm.Group label="可领取时间">
+      <ProForm.Group label="费用">
         <ProFormText
           name="unit_price"
           width="xs"
           label="单价（单位：元）"
+          required
           rules={[
             {
-              required: true,
-              message: '请输入正确的单价',
+              validator: async (_, value) => {
+                if (!value || value.length == 0) {
+                  throw new Error('请输入单价');
+                }
+                if (isNaN(value)) {
+                  throw new Error('请输入正确的单价!');
+                }
+              },
             },
           ]}
           readonly={readOnly}
@@ -102,16 +111,23 @@ export default (props: Prop) => {
           name="discount"
           width="xs"
           label="折扣（0~100）"
+          required
           rules={[
             {
-              required: true,
-              message: '请输入正确的折扣',
+              validator: async (_, value) => {
+                if (!value || value.length == 0) {
+                  throw new Error('请输入折扣');
+                }
+                if (isNaN(value) && (value < 0 || value > 100)) {
+                  throw new Error('请输入正确的单价!');
+                }
+              },
             },
           ]}
           readonly={readOnly}
         />
       </ProForm.Group>
-      <ProForm.Group label="网点状态">
+      <ProForm.Group label="状态">
         <ProFormSelect
           initialValue={initialValues ? undefined : 0}
           options={[
