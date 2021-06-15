@@ -31,6 +31,8 @@ type Prop = {
 };
 const DefaultinitialValues = {
   belong_branch_id: '',
+  id_card_image_front: '',
+  id_card_image_behind: '',
 };
 export default (props: Prop) => {
   const { initialValues, visible, updateTable, updateVisible, mode } = props;
@@ -177,28 +179,15 @@ export default (props: Prop) => {
             headers: { contentType: 'multipart/form-data' },
             maxCount: 1,
             onChange: ({ file }) => {
-              if (file.status == 'done') {
-                formRef?.current?.setFieldsValue({
-                  id_card_image_front: file.response.data,
-                });
-              }
+              const base64 = utils.imageFile2Base64(file);
+              console.log(base64);
             },
           }}
           rules={[{ required: true, message: '请上传身份证正面' }]}
           action={uploadPath}
-        >
-          {initialValues?.id_card_image_front ? (
-            <img
-              src={initialValues.id_card_image_front}
-              style={{ width: '100%' }}
-            />
-          ) : (
-            ''
-          )}
-        </ProFormUploadDragger>
+        />
         <ProFormUploadDragger
           label="身份证反面"
-          name="id_card_image_behind"
           fieldProps={{
             name: 'file',
             headers: { contentType: 'multipart/form-data' },

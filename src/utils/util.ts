@@ -70,6 +70,18 @@ function getBirthdayByIdcard(idCard) {
 function checkIdCard(idCard) {
   return /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/.test(idCard);
 }
+/**
+ *
+ * @param img
+ * @param callback
+ */
+function imageFile2Base64(img): Promise<string | ArrayBuffer | null> {
+  const reader = new FileReader();
+  return new Promise((resolve) => {
+    reader.addEventListener('load', () => resolve(reader.result));
+    reader.readAsDataURL(img);
+  });
+}
 export default {
   array2Query,
   yuan2fen,
@@ -78,4 +90,5 @@ export default {
   checkIdCard,
   getSexByIdcard,
   getBirthdayByIdcard,
+  imageFile2Base64,
 };
