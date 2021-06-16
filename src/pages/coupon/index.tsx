@@ -31,12 +31,12 @@ export default () => {
       dataIndex: 'name',
     },
     {
-      title: '开始时间',
+      title: '生效时间',
       width: 140,
       dataIndex: 'start_time',
       valueType: 'dateTime',
       formItemProps: {
-        label: '大于等于开始时间',
+        label: '大于等于生效时间',
         labelCol: {
           md: 8,
         },
@@ -45,12 +45,12 @@ export default () => {
       render: (_, entity) => new Date(entity.start_time).toLocaleString(),
     },
     {
-      title: '结束时间',
+      title: '失效时间',
       width: 140,
       dataIndex: 'end_time',
       valueType: 'dateTime',
       formItemProps: {
-        label: '小于等于结束时间',
+        label: '小于等于失效时间',
         labelCol: {
           md: 8,
         },
@@ -65,13 +65,6 @@ export default () => {
       valueType: 'dateTimeRange',
       sorter: (a, b) => a.created - b.created,
       render: (_, entity) => new Date(entity.created).toLocaleString(),
-    },
-    {
-      title: '描述',
-      dataIndex: 'description',
-      ellipsis: true,
-      // copyable: true,
-      renderFormItem: () => false,
     },
     {
       title: '操作',

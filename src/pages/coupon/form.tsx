@@ -79,7 +79,7 @@ export default (props: Prop) => {
         <ProFormDateTimePicker
           name="start_time"
           width="md"
-          label="开始时间"
+          label="生效时间"
           rules={[
             {
               required: true,
@@ -91,7 +91,7 @@ export default (props: Prop) => {
         <ProFormDateTimePicker
           name="end_time"
           width="md"
-          label="结束时间"
+          label="失效时间"
           rules={[
             {
               required: true,
@@ -101,7 +101,7 @@ export default (props: Prop) => {
           readonly={readOnly}
         />
       </ProForm.Group>
-      <ProForm.Group label="描述">
+      <ProForm.Group label="使用说明">
         <ProFormTextArea name="description" width="xl" readonly={readOnly} />
       </ProForm.Group>
     </DrawerForm>

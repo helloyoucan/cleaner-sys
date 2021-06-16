@@ -19,6 +19,7 @@ function array2Query(list: any[], key): string {
  * @returns
  */
 function yuan2fen(fen: number): number {
+  if (isNaN(fen)) return 0;
   return fen * 100;
 }
 /**
@@ -27,6 +28,7 @@ function yuan2fen(fen: number): number {
  * @returns
  */
 function fen2yuan(yuan: number): number {
+  if (isNaN(yuan)) return 0;
   return yuan / 100;
 }
 /**

@@ -44,10 +44,22 @@ export default () => {
       },
     },
     {
-      title: '实收金额',
-      dataIndex: 'total_price',
+      title: '总金额',
+      dataIndex: 'total_amount',
       renderFormItem: () => false,
-      render: (_, entity) => utils.fen2yuan(entity.total_price),
+      render: (_, entity) => utils.fen2yuan(entity.total_amount),
+    },
+    {
+      title: '优惠金额',
+      dataIndex: 'discount_amount',
+      renderFormItem: () => false,
+      render: (_, entity) => utils.fen2yuan(entity.discount_amount),
+    },
+    {
+      title: '实收金额',
+      dataIndex: 'paid_in_amount',
+      renderFormItem: () => false,
+      render: (_, entity) => utils.fen2yuan(entity.paid_in_amount),
     },
     {
       title: '创建时间',

@@ -57,6 +57,13 @@ export const deleteBranch = (ids: (string | number)[]) =>
 export type CouponItem = {
   id?: string;
   name: string;
+  amount: number;
+  type: number;
+  type_value: number;
+  threshold: number;
+  threshold_value: number;
+  expiry_type: number;
+  expiry_type_value: number;
   start_time: number;
   end_time: number;
   description: string;
@@ -188,7 +195,9 @@ export type OrderItem = {
   order_num: string;
   user_id: string;
   status: number;
-  total_price: number;
+  total_amount: number;
+  paid_in_amount: number;
+  discount_amount: number;
   refund_status: number;
   refund_s_arrival_time: number;
   created: number;
