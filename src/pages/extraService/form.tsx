@@ -57,6 +57,7 @@ export default (props: Prop) => {
         destroyOnClose: true,
       }}
       onFinish={async (_values) => {
+        if (readOnly) return true;
         let res;
         const values: ExtraServiceItem = {
           ..._values,

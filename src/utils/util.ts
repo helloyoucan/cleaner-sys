@@ -82,6 +82,43 @@ function imageFile2Base64(img): Promise<string | ArrayBuffer | null> {
     reader.readAsDataURL(img);
   });
 }
+
+/**
+ * 根据出生日期算出年龄
+ * @param birthday 生日的时间戳
+ * @returns
+ */
+function birthday2Age(birthday: number) {
+  var returnAge;
+  var birthdayDate = new Date(birthday);
+  var birthYear = birthdayDate.getFullYear();
+  var birthMonth = birthdayDate.getMonth() + 1;
+  var birthDay = birthdayDate.getDate();
+
+  const d = new Date();
+  var nowYear = d.getFullYear();
+  var nowMonth = d.getMonth() + 1;
+  var nowDay = d.getDate();
+
+  if (nowYear == birthYear) {
+    returnAge = 0; //同年 则为0岁
+  } else {
+    var ageDiff = nowYear - birthYear; //年之差
+    if (ageDiff > 0) {
+      if (nowMonth == birthMonth) {
+        var dayDiff = nowDay - birthDay; //日之差
+        returnAge = dayDiff < 0 ? ageDiff - 1 : ageDiff;
+      } else {
+        var monthDiff = nowMonth - birthMonth; //月之差
+        returnAge = monthDiff < 0 ? ageDiff - 1 : ageDiff;
+      }
+    } else {
+      returnAge = -1; //返回-1 表示出生日期输入错误 晚于今天
+    }
+  }
+
+  return returnAge; //返回周岁年龄
+}
 export default {
   array2Query,
   yuan2fen,
@@ -91,4 +128,5 @@ export default {
   getSexByIdcard,
   getBirthdayByIdcard,
   imageFile2Base64,
+  birthday2Age,
 };

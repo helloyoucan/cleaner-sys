@@ -135,7 +135,7 @@ export type WarriorItem = {
   id?: string;
   name: string;
   phone: number;
-  age: number;
+  birthday: number;
   sex: number;
   join_time: number;
   belong_branch_id: string;

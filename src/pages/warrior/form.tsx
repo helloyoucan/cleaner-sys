@@ -1,13 +1,8 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { Button, message } from 'antd';
 import provinceOptions from '@/utils/city';
-import type { FormInstance } from 'antd';
-import {
-  addWarrior,
-  getAllBranch,
-  updateWarrior,
-  uploadPath,
-} from '@/api/index';
+import type { FormInstance, Upload } from 'antd';
+import { addWarrior, updateWarrior, uploadPath } from '@/api/index';
 import type { WarriorItem } from '@/api/index';
 import ProForm, {
   DrawerForm,
@@ -28,18 +23,91 @@ type Prop = {
   updateTable(): void;
   updateVisible(visable: boolean): void;
   mode: 'read' | 'edit';
+  branchOptions: { label: string; value: string }[];
+};
+export declare type UploadFileStatus =
+  | 'error'
+  | 'success'
+  | 'done'
+  | 'uploading'
+  | 'removed';
+export interface HttpRequestHeader {
+  [key: string]: string;
+}
+export interface UploadFile<T = any> {
+  uid: string;
+  size?: number;
+  name: string;
+  fileName?: string;
+  lastModified?: number;
+  lastModifiedDate?: Date;
+  url?: string;
+  status?: UploadFileStatus;
+  percent?: number;
+  thumbUrl?: string;
+  originFileObj?: any;
+  response?: T;
+  error?: any;
+  linkProps?: any;
+  type?: string;
+  xhr?: T;
+  preview?: string;
+}
+type IdCardImageListType = {
+  id_card_image_front_list?: UploadFile[];
+  id_card_image_behind_list?: UploadFile[];
 };
 const DefaultinitialValues = {
   belong_branch_id: '',
-  id_card_image_front: '',
-  id_card_image_behind: '',
+  id_card_image_front_list: [],
+  id_card_image_behind_list: [],
+};
+const beforeUpload = (file) => {
+  const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
+  if (!isJpgOrPng) message.error('请选择 JPG或PNG文件');
+  const isLt2M = file.size / 1024 / 1024 < 8;
+  if (!isLt2M) message.error('照片文件不能大于8M');
+  return isJpgOrPng && isLt2M;
+};
+const toUploadImageList = (imgUrl) => {
+  return imgUrl
+    ? [
+        {
+          uid: '1',
+          name: imgUrl.replace(/.*\//, ''),
+          status: 'done',
+          url: imgUrl,
+          response: { code: 0, data: imgUrl },
+        },
+      ]
+    : [];
+};
+const getImgUrlByUploadImageList = (imgList) => {
+  if (
+    imgList &&
+    imgList.length > 0 &&
+    imgList[0].status == 'done' &&
+    imgList[0].response?.code == 0
+  ) {
+    return imgList[0].response.data;
+  }
+  return '';
 };
 export default (props: Prop) => {
-  const { initialValues, visible, updateTable, updateVisible, mode } = props;
+  const {
+    initialValues,
+    visible,
+    updateTable,
+    updateVisible,
+    mode,
+    branchOptions,
+  } = props;
   const readOnly = mode == 'read';
   const formRef = useRef<FormInstance>();
+  const [idCardImageFront, setIdCardImageFront] = useState<string | null>('');
+  const [idCardImageBehind, setIdCardImageBehind] = useState<string | null>('');
   return (
-    <DrawerForm<WarriorItem>
+    <DrawerForm<WarriorItem & IdCardImageListType>
       title={(readOnly ? '查看' : initialValues ? '修改' : '新增') + '战士'}
       formRef={formRef}
       visible={visible}
@@ -47,10 +115,22 @@ export default (props: Prop) => {
         initialValues
           ? {
               ...initialValues,
+              id_card_image_front_list: toUploadImageList(
+                initialValues.id_card_image_front,
+              ),
+              id_card_image_behind_list: toUploadImageList(
+                initialValues.id_card_image_behind,
+              ),
             }
           : DefaultinitialValues
       }
-      onVisibleChange={(visible) => updateVisible(visible)}
+      onVisibleChange={(visible) => {
+        visible &&
+          setIdCardImageFront(initialValues?.id_card_image_front || '');
+        visible &&
+          setIdCardImageBehind(initialValues?.id_card_image_behind || '');
+        updateVisible(visible);
+      }}
       trigger={
         <Button type="primary">
           <PlusOutlined />
@@ -61,11 +141,21 @@ export default (props: Prop) => {
         forceRender: false,
         destroyOnClose: true,
       }}
-      onFinish={async (_values) => {
+      onFinish={async (_values: WarriorItem & IdCardImageListType) => {
+        if (readOnly) return true;
         let res;
         const values = {
           ..._values,
+          phone: +_values.phone,
+          id_card_image_front: getImgUrlByUploadImageList(
+            _values.id_card_image_front_list,
+          ),
+          id_card_image_behind: getImgUrlByUploadImageList(
+            _values.id_card_image_behind_list,
+          ),
         };
+        delete values.id_card_image_front_list;
+        delete values.id_card_image_behind_list;
         if (initialValues) {
           res = await updateWarrior({ ...initialValues, ...values });
         } else {
@@ -80,7 +170,10 @@ export default (props: Prop) => {
         updateTable();
         return true;
       }}
-      onValuesChange={(value: WarriorItem, values: WarriorItem) => {
+      onValuesChange={(
+        value: WarriorItem & IdCardImageListType,
+        values: WarriorItem,
+      ) => {
         // 省/市 清除选择的值的的联动
         if (!values.province) {
           formRef?.current?.setFieldsValue({
@@ -162,40 +255,102 @@ export default (props: Prop) => {
             {
               required: true,
               validator: async (_, value) => {
-                if (!value || value.length == 0) {
+                if (!value || value.length == 0)
                   throw new Error('请输入身份证号码');
-                }
-                if (!utils.checkIdCard(value)) {
+                if (!utils.checkIdCard(value))
                   throw new Error('请输入正确的身份证号码');
-                }
               },
             },
           ]}
         />
         <ProFormUploadDragger
+          {...(readOnly
+            ? {
+                icon: '',
+                title: '',
+                description: '',
+              }
+            : {
+                title: '身份证正面',
+                description: 'JPG或PNG文件，最大8M',
+              })}
           label="身份证正面"
+          name="id_card_image_front_list"
+          // readonly={readOnly}
           fieldProps={{
+            disabled: readOnly,
             name: 'file',
             headers: { contentType: 'multipart/form-data' },
             maxCount: 1,
-            onChange: ({ file }) => {
-              const base64 = utils.imageFile2Base64(file);
-              console.log(base64);
+            onChange: async (info) => {
+              if (
+                info.file.status === 'done' &&
+                info.file.response?.code == 0
+              ) {
+                const base64 = await utils.imageFile2Base64(
+                  info.file.originFileObj,
+                );
+                setIdCardImageFront(base64 as string);
+              }
             },
+            beforeUpload,
+            onRemove: () => setIdCardImageFront(''),
           }}
           rules={[{ required: true, message: '请上传身份证正面' }]}
           action={uploadPath}
-        />
+        >
+          {idCardImageFront ? (
+            <img
+              src={idCardImageFront}
+              alt="身份证正面"
+              style={{ width: '200px' }}
+            />
+          ) : (
+            ''
+          )}
+        </ProFormUploadDragger>
         <ProFormUploadDragger
+          {...(readOnly
+            ? {
+                icon: '',
+                title: '',
+                description: '',
+              }
+            : {
+                title: '身份证反面',
+                description: 'JPG或PNG文件，最大8M',
+              })}
           label="身份证反面"
+          name="id_card_image_behind_list"
           fieldProps={{
+            disabled: readOnly,
             name: 'file',
             headers: { contentType: 'multipart/form-data' },
             maxCount: 1,
+            onChange: async (info) => {
+              if (info.file.status === 'done' && info.file.response.code == 0) {
+                const base64 = await utils.imageFile2Base64(
+                  info.file.originFileObj,
+                );
+                setIdCardImageBehind(base64 as string);
+              }
+            },
+            beforeUpload,
+            onRemove: () => setIdCardImageBehind(''),
           }}
           rules={[{ required: true, message: '请上传身份证反面' }]}
           action={uploadPath}
-        />
+        >
+          {idCardImageBehind ? (
+            <img
+              src={idCardImageBehind}
+              alt="身份证正面"
+              style={{ width: '200px' }}
+            />
+          ) : (
+            ''
+          )}
+        </ProFormUploadDragger>
       </ProForm.Group>
       <ProForm.Group label="户籍地址">
         <ProFormSelect
@@ -340,18 +495,11 @@ export default (props: Prop) => {
       </ProForm.Group>
       <ProForm.Group label="所属网点">
         <ProFormSelect
-          request={async () => {
-            const res = await getAllBranch();
-            return [
-              ...(res.code == 0
-                ? res.data.map((item) => ({ label: item.name, value: item.id }))
-                : []),
-              { label: '无', value: '' },
-            ];
-          }}
+          options={branchOptions}
           width="lg"
           name="belong_branch_id"
           readonly={readOnly}
+          showSearch={true}
         />
       </ProForm.Group>
     </DrawerForm>

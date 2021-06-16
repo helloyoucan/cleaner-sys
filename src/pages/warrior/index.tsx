@@ -1,10 +1,10 @@
-import { useRef, useState } from 'react';
-import { getWarrior, deleteWarrior } from '@/api/index';
+import { useRef, useState, useEffect } from 'react';
+import { getWarrior, deleteWarrior, getAllBranch } from '@/api/index';
 import type { WarriorItem } from '@/api/index';
-import { Space, Cascader, Popconfirm, message } from 'antd';
+import { Space, Select, Popconfirm, message } from 'antd';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
-import { EnumBranchStatus, EnumSex } from '@/enum/index';
+import { EnumWarriorStatus, EnumSex } from '@/enum/index';
 import Form from './form';
 import utils from '@/utils/util';
 type FormQueryType = {
@@ -21,6 +21,27 @@ export default () => {
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [formData, setFormData] = useState<WarriorItem | undefined>();
   const [formMode, setFormMode] = useState<'read' | 'edit'>('edit');
+  const [searchFormBranchId, setSearchFormBranchId] = useState('');
+  const [branchOptions, setBranchOptions] = useState<
+    { label: string; value: string }[]
+  >([]);
+  const [branchMap, setBranchMap] = useState(new Map<string, string>());
+  useEffect(() => {
+    const map = new Map<string, string>();
+    map.set('', '无');
+    getAllBranch().then((res) => {
+      setBranchOptions([
+        ...(res.code == 0
+          ? res.data.map((item) => {
+              map.set(item.id || item.name, item.name);
+              return { label: item.name, value: item.id || '' };
+            })
+          : []),
+        { label: '无', value: '' },
+      ]);
+      setBranchMap(map);
+    });
+  }, []);
   const columns: ProColumns<WarriorItem>[] = [
     {
       title: '排序',
@@ -34,8 +55,9 @@ export default () => {
     },
     {
       title: '年龄',
-      dataIndex: 'id_card',
+      dataIndex: 'birthday',
       renderFormItem: () => false,
+      render: (_, entity) => utils.birthday2Age(entity.birthday),
     },
     {
       title: '性别',
@@ -54,6 +76,22 @@ export default () => {
     {
       title: '所属网点',
       dataIndex: 'belong_branch_id',
+      render: (_, entity) => branchMap.get(entity.belong_branch_id),
+      renderFormItem: () => (
+        <Select
+          showSearch
+          allowClear
+          style={{ width: 200 }}
+          placeholder="选择所属网点"
+          onChange={(value) => setSearchFormBranchId(value as string)}
+          options={branchOptions}
+          filterOption={(input, option) =>
+            (option as { label: string }).label
+              .toLowerCase()
+              .indexOf(input.toLowerCase()) >= 0
+          }
+        />
+      ),
     },
     {
       title: '状态',
@@ -61,9 +99,8 @@ export default () => {
       filters: true,
       onFilter: true,
       valueEnum: {
-        [EnumBranchStatus.close]: { text: '关闭', status: 'Error' },
-        [EnumBranchStatus.open]: { text: '营业中', status: 'Success' },
-        [EnumBranchStatus.rest]: { text: '休息中', status: 'Default' },
+        [EnumWarriorStatus.disable]: { text: '禁用', status: 'Default' },
+        [EnumWarriorStatus.enable]: { text: '启用', status: 'Success' },
       },
     },
     {
@@ -123,6 +160,7 @@ export default () => {
       actionRef={ref}
       columns={columns}
       rowSelection={{}}
+      onReset={() => setSearchFormBranchId('')}
       tableAlertRender={({
         selectedRowKeys,
         selectedRows,
@@ -165,11 +203,11 @@ export default () => {
           page: params.current,
           page_size: params.pageSize,
           name: params.name,
-          phone: params.phone,
-          belong_branch_id: params.belong_branch_id,
+          // phone: params.phone,
+          belong_branch_id: searchFormBranchId,
           status: params.status,
-          created_start_time: utils.dateTime2time(params.created?.[0]),
-          created_end_time: utils.dateTime2time(params.created?.[1]),
+          // created_start_time: utils.dateTime2time(params.created?.[0]),
+          // created_end_time: utils.dateTime2time(params.created?.[1]),
         }).then((res) => {
           if (res.code != 0) {
             return {
@@ -210,6 +248,7 @@ export default () => {
             }
           }}
           updateTable={() => ref?.current?.reload()}
+          branchOptions={branchOptions}
         ></Form>,
       ]}
     />
