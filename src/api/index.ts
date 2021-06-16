@@ -181,3 +181,105 @@ export const deleteWarrior = (ids: (string | number)[]) =>
     method: 'delete',
     url: '/api/system/warrior?' + utils.array2Query(ids, 'id'),
   });
+
+// 订单
+export type OrderItem = {
+  id: string;
+  order_num: string;
+  user_id: string;
+  status: number;
+  total_price: number;
+  refund_status: number;
+  refund_s_arrival_time: number;
+  created: number;
+  // 接单战士
+  warrior: {
+    id: string;
+    name: string;
+    phone: number;
+    belong_branch_id: string;
+  };
+  //服务网点信息
+  branch: {
+    id: string;
+    name: string;
+    latitude: number;
+    longitude: number;
+    province: string;
+    city: string;
+    area: string;
+    address: string;
+    contact_person: string;
+    contact_phone: number;
+    warrior_manager_id: string;
+    range: number;
+    base_cost: number;
+    extra_range_unit_price: number;
+    status: number;
+    remark: string;
+    created: number;
+  };
+  //服务地址及联系人信息
+  client_info: {
+    user_id: string;
+    name: string;
+    phone: number;
+    province: string;
+    city: string;
+    area: string;
+    address: string;
+    distance: number;
+    start_time: number;
+    end_time: number;
+  };
+  // 电器信息
+  machine: {
+    brand: string;
+    type: string;
+    mode: string;
+    photos_json_str: string;
+    remark: string;
+  };
+  // 订单选择的附加服务
+  extra_services: Array<{
+    id: string;
+    order_id: string;
+    extra_service_id: string;
+    name: string;
+    unit_price: number;
+    discount: number;
+    description: string;
+  }>;
+  // 订单使用的优惠券
+  order_coupons: Array<{
+    id: string;
+    user_coupon_id: string;
+    name: string;
+    start_time: number;
+    end_time: number;
+    description: string;
+    order_id: string;
+  }>;
+};
+export const getOrder = ({ page = 1, page_size = 10, ...query }) =>
+  request<APIResponse<OrderItem[]>>({
+    method: 'get',
+    url: '/api/system/order/pages',
+    params: {
+      page,
+      page_size,
+      ...query,
+    },
+  });
+
+export const updateOrder = (data: OrderItem) =>
+  request<APIResponse<null>>({
+    method: 'put',
+    url: '/api/system/order',
+    data,
+  });
+export const deleteOrder = (ids: (string | number)[]) =>
+  request<APIResponse<number>>({
+    method: 'delete',
+    url: '/api/system/order?' + utils.array2Query(ids, 'id'),
+  });

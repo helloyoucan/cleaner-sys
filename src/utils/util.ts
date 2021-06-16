@@ -71,7 +71,7 @@ function checkIdCard(idCard) {
   return /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/.test(idCard);
 }
 /**
- *
+ * 从File对象读取加载，返回Base64
  * @param img
  * @param callback
  */
