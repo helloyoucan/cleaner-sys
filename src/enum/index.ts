@@ -17,3 +17,19 @@ export enum EnumWarriorStatus {
   disable = 0, //禁用（禁止接单）
   enable = 1,
 }
+//优惠类型
+export enum EnumCouponType {
+  amount = 0, //指定金额
+  discount = 1, // 折扣
+}
+// 使用门槛
+export enum EnumCouponThreshold {
+  none = 0, //无
+  fixedAmount = 1, //满足指定金额
+  firstOrder = 2, //用户首单
+}
+//有效期类型
+export enum EnumCouponExpiryType {
+  fixedDate = 0, //固定日期
+  afterGet = 1, //领取当日开始N天内有效
+}

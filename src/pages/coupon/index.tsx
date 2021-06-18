@@ -6,13 +6,19 @@ import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import Form from './form';
 import utils from '@/utils/util';
+import {
+  EnumCouponType,
+  EnumCouponThreshold,
+  EnumCouponExpiryType,
+} from '@/enum';
 type FormQueryType = {
   created?: string[];
   current?: number;
-  name?: string;
   pageSize?: number;
-  start_time?: string;
-  end_time?: string;
+  name?: string;
+  type?: number;
+  threshold?: number;
+  expiry_type?: number;
 };
 export default () => {
   const ref = useRef<ActionType>();
@@ -31,32 +37,37 @@ export default () => {
       dataIndex: 'name',
     },
     {
-      title: '生效时间',
-      width: 140,
-      dataIndex: 'start_time',
-      valueType: 'dateTime',
-      formItemProps: {
-        label: '大于等于生效时间',
-        labelCol: {
-          md: 8,
-        },
-      },
-      sorter: (a, b) => a.start_time - b.start_time,
-      render: (_, entity) => new Date(entity.start_time).toLocaleString(),
+      title: '总数量',
+      dataIndex: 'total_amount',
     },
     {
-      title: '失效时间',
-      width: 140,
-      dataIndex: 'end_time',
-      valueType: 'dateTime',
-      formItemProps: {
-        label: '小于等于失效时间',
-        labelCol: {
-          md: 8,
-        },
+      title: '剩余数量',
+      dataIndex: 'amount',
+    },
+    {
+      title: '类型',
+      dataIndex: 'type',
+      valueEnum: {
+        [EnumCouponType.amount]: { text: '指定金额' },
+        [EnumCouponType.discount]: { text: '折扣' },
       },
-      sorter: (a, b) => a.end_time - b.end_time,
-      render: (_, entity) => new Date(entity.end_time).toLocaleString(),
+    },
+    {
+      title: '使用门槛',
+      dataIndex: 'threshold_type',
+      valueEnum: {
+        [EnumCouponThreshold.none]: { text: '无' },
+        [EnumCouponThreshold.fixedAmount]: { text: '满足指定金额' },
+        [EnumCouponThreshold.firstOrder]: { text: '用户首单' },
+      },
+    },
+    {
+      title: '有效期类型',
+      dataIndex: 'expiry_type',
+      valueEnum: {
+        [EnumCouponExpiryType.fixedDate]: { text: '固定日期' },
+        [EnumCouponExpiryType.afterGet]: { text: '领取当日开始N天内有效' },
+      },
     },
     {
       title: '创建时间',
@@ -156,8 +167,6 @@ export default () => {
           page: params.current,
           page_size: params.pageSize,
           name: params.name,
-          start_time: utils.dateTime2time(params.start_time),
-          end_time: utils.dateTime2time(params.end_time),
           created_start_time: utils.dateTime2time(params.created?.[0]),
           created_end_time: utils.dateTime2time(params.created?.[1]),
         }).then((res) => {

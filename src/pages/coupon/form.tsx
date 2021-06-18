@@ -8,9 +8,16 @@ import ProForm, {
   ProFormText,
   ProFormTextArea,
   ProFormDateTimePicker,
+  ProFormSelect,
+  ProFormDependency,
 } from '@ant-design/pro-form';
 import { PlusOutlined } from '@ant-design/icons';
 import util from '@/utils/util';
+import {
+  EnumCouponType,
+  EnumCouponThreshold,
+  EnumCouponExpiryType,
+} from '@/enum';
 type Prop = {
   visible: boolean;
   initialValues?: CouponItem;
@@ -74,6 +81,110 @@ export default (props: Prop) => {
           readonly={readOnly}
           rules={[{ required: true, message: '请输入优惠券名称' }]}
         />
+      </ProForm.Group>
+      <ProForm.Group label="总数量">
+        <ProFormText
+          width="md"
+          name="total_amount"
+          readonly={readOnly}
+          required
+          rules={[
+            {
+              validator: async (_, value) => {
+                if (!value || value.length == 0)
+                  throw new Error('请输入优惠券数量');
+                if (isNaN(value)) throw new Error('请输入数字');
+              },
+            },
+          ]}
+        />
+      </ProForm.Group>
+      <ProForm.Group>
+        <ProFormSelect
+          label="类型"
+          options={[
+            { value: EnumCouponType.amount, label: '指定金额' },
+            { value: EnumCouponType.discount, label: '折扣' },
+          ]}
+          width="sm"
+          name="type"
+          readonly={readOnly}
+        />
+        <ProFormDependency name={['type']}>
+          {({ type }) => {
+            const rules: any[] = [];
+            let label = '';
+            if (type == EnumCouponType.amount) {
+              label = '指定金额';
+              rules.push({
+                validator: async (_, value) => {
+                  if (!value || value.length == 0)
+                    throw new Error('请输入指定金额');
+                  if (isNaN(value)) throw new Error('请输入数字');
+                },
+              });
+            }
+            if (type == EnumCouponType.discount) {
+              label = '折扣(1-100)';
+              rules.push({
+                validator: async (_, value) => {
+                  if (!value || value.length == 0)
+                    throw new Error('请输入折扣');
+                  if (isNaN(value)) throw new Error('请输入数字');
+                  if (value < 1 || value > 100)
+                    throw new Error('请输入1到100的折扣');
+                },
+              });
+            }
+            return (
+              <ProFormText
+                width="md"
+                name="type_value"
+                readonly={readOnly}
+                required
+                label
+                rules={rules}
+              />
+            );
+          }}
+        </ProFormDependency>
+      </ProForm.Group>
+      <ProForm.Group>
+        <ProFormSelect
+          label="使用门槛"
+          options={[
+            { value: EnumCouponThreshold.none, label: '无' },
+            { value: EnumCouponThreshold.fixedAmount, label: '满足指定金额' },
+            { value: EnumCouponThreshold.firstOrder, label: '用户首单' },
+          ]}
+          width="sm"
+          name="threshold_type"
+          readonly={readOnly}
+        />
+        <ProFormDependency name={['threshold_type']}>
+          {({ threshold_type }) => {
+            if (threshold_type === EnumCouponThreshold.fixedAmount) {
+              return (
+                <ProFormText
+                  width="md"
+                  name="threshold_value"
+                  readonly={readOnly}
+                  required
+                  label="指定金额"
+                  rules={[
+                    {
+                      validator: async (_, value) => {
+                        if (!value || value.length == 0)
+                          throw new Error('请输入指定金额');
+                        if (isNaN(value)) throw new Error('请输入数字');
+                      },
+                    },
+                  ]}
+                />
+              );
+            }
+          }}
+        </ProFormDependency>
       </ProForm.Group>
       <ProForm.Group label="可领取时间">
         <ProFormDateTimePicker
