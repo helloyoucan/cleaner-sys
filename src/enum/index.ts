@@ -23,7 +23,7 @@ export enum EnumCouponType {
   discount = 1, // 折扣
 }
 // 使用门槛
-export enum EnumCouponThreshold {
+export enum EnumCouponThresholdType {
   none = 0, //无
   fixedAmount = 1, //满足指定金额
   firstOrder = 2, //用户首单

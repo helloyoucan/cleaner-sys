@@ -97,12 +97,9 @@ export default (props: Prop) => {
           rules={[
             {
               validator: async (_, value) => {
-                if (!value || value.length == 0) {
-                  throw new Error('请输入单价');
-                }
-                if (isNaN(value)) {
-                  throw new Error('请输入正确的单价!');
-                }
+                if (!value || value.length == 0) throw new Error('请输入单价');
+                if (isNaN(value)) throw new Error('请输入正确的单价!');
+                if (value < 0) throw new Error('请输入大于0的数字');
               },
             },
           ]}
@@ -116,12 +113,10 @@ export default (props: Prop) => {
           rules={[
             {
               validator: async (_, value) => {
-                if (!value || value.length == 0) {
-                  throw new Error('请输入折扣');
-                }
-                if (isNaN(value) && (value < 0 || value > 100)) {
+                if (!value || value.length == 0) throw new Error('请输入折扣');
+                if (isNaN(value) && (value < 0 || value > 100))
                   throw new Error('请输入正确的单价!');
-                }
+                if (value < 0) throw new Error('请输入大于0的数字');
               },
             },
           ]}

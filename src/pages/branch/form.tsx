@@ -187,12 +187,10 @@ export default (props: Prop) => {
           rules={[
             {
               validator: async (_, value) => {
-                if (!value || value.length == 0) {
+                if (!value || value.length == 0)
                   throw new Error('请输入服务范围半径');
-                }
-                if (isNaN(value)) {
-                  throw new Error('请输入正确的服务范围半径');
-                }
+                if (isNaN(value)) throw new Error('请输入正确的服务范围半径');
+                if (value < 0) throw new Error('请输入大于0的数字');
               },
             },
           ]}
@@ -206,12 +204,10 @@ export default (props: Prop) => {
           rules={[
             {
               validator: async (_, value) => {
-                if (!value || value.length == 0) {
+                if (!value || value.length == 0)
                   throw new Error('请输入基础服务费');
-                }
-                if (isNaN(value)) {
-                  throw new Error('请输入正确的基础服务费');
-                }
+                if (isNaN(value)) throw new Error('请输入正确的基础服务费');
+                if (value < 0) throw new Error('请输入大于0的数字');
               },
             },
           ]}
@@ -225,12 +221,11 @@ export default (props: Prop) => {
           rules={[
             {
               validator: async (_, value) => {
-                if (!value || value.length == 0) {
+                if (!value || value.length == 0)
                   throw new Error('请输入超出服务范围收费');
-                }
-                if (isNaN(value)) {
+                if (isNaN(value))
                   throw new Error('请输入正确的超出服务范围收费');
-                }
+                if (value < 0) throw new Error('请输入大于0的数字');
               },
             },
           ]}

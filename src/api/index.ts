@@ -57,16 +57,16 @@ export const deleteBranch = (ids: (string | number)[]) =>
 export type CouponItem = {
   id?: string;
   name: string;
-  total_amount: string;
+  total_amount: number;
   amount: number; //可领取数量
   type: number; // 优惠类型 0:指定金额，1:折扣
   type_value: number; // 优惠类型对应的值
   threshold_type: number; // 使用门槛 0:无，1:指定金额，2:用户首单
   threshold_value: number; //有使用门槛时对应的值
   expiry_type: number; //有效期类型 0:固定日期,1:领取当日开始N天内有效
-  expiry_type_value: number; //当ExpiryType=1时，绑定的值
-  start_time: number;
-  end_time: number;
+  expiry_type_value?: number; //当ExpiryType=1时，绑定的值
+  start_time?: number;
+  end_time?: number;
   description: string;
   created: number;
 };

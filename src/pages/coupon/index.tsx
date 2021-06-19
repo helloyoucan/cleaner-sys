@@ -8,7 +8,7 @@ import Form from './form';
 import utils from '@/utils/util';
 import {
   EnumCouponType,
-  EnumCouponThreshold,
+  EnumCouponThresholdType,
   EnumCouponExpiryType,
 } from '@/enum';
 type FormQueryType = {
@@ -41,8 +41,8 @@ export default () => {
       dataIndex: 'total_amount',
     },
     {
-      title: '剩余数量',
-      dataIndex: 'amount',
+      title: '已被领取',
+      dataIndex: 'issued_amount',
     },
     {
       title: '类型',
@@ -56,9 +56,9 @@ export default () => {
       title: '使用门槛',
       dataIndex: 'threshold_type',
       valueEnum: {
-        [EnumCouponThreshold.none]: { text: '无' },
-        [EnumCouponThreshold.fixedAmount]: { text: '满足指定金额' },
-        [EnumCouponThreshold.firstOrder]: { text: '用户首单' },
+        [EnumCouponThresholdType.none]: { text: '无' },
+        [EnumCouponThresholdType.fixedAmount]: { text: '满足指定金额' },
+        [EnumCouponThresholdType.firstOrder]: { text: '用户首单' },
       },
     },
     {
