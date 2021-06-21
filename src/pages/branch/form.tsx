@@ -133,9 +133,10 @@ export default (props: Prop) => {
         />
       </ProForm.Group>
       <ProForm.Group label="地址">
-        <div style={{ width: '552px' }}>
-          <BaiduMap />
-        </div>
+        <BaiduMap
+          latitude={initialValues?.latitude || locationData?.latitude}
+          longitude={initialValues?.longitude || locationData?.longitude}
+        />
         {initialValues && readOnly && (
           <>
             <ProFormText
