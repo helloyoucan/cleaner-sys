@@ -1,8 +1,9 @@
 import { useRef, useState, useEffect } from 'react';
 import { getWarrior, deleteWarrior, getAllBranch } from '@/api/index';
 import type { WarriorItem } from '@/api/index';
-import { Space, Select, Popconfirm, message } from 'antd';
+import { Space, Select, Popconfirm, message, Button } from 'antd';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
+import { PlusOutlined } from '@ant-design/icons';
 import ProTable from '@ant-design/pro-table';
 import { EnumWarriorStatus, EnumSex } from '@/enum/index';
 import Form from './form';
@@ -236,6 +237,10 @@ export default () => {
       }}
       options={{ fullScreen: true }}
       toolBarRender={() => [
+        <Button type="primary" onClick={() => setDrawerVisible(true)}>
+          <PlusOutlined />
+          新建战士
+        </Button>,
         <Form
           mode={formMode}
           visible={drawerVisible}

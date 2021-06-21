@@ -1,8 +1,9 @@
 import { useRef, useState } from 'react';
 import { getCoupon, deleteCoupon } from '@/api/index';
 import type { CouponItem } from '@/api/index';
-import { Space, Popconfirm, message } from 'antd';
+import { Space, Popconfirm, message, Button } from 'antd';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
+import { PlusOutlined } from '@ant-design/icons';
 import ProTable from '@ant-design/pro-table';
 import Form from './form';
 import utils from '@/utils/util';
@@ -197,6 +198,10 @@ export default () => {
       }}
       options={{ fullScreen: true }}
       toolBarRender={() => [
+        <Button type="primary" onClick={() => setDrawerVisible(true)}>
+          <PlusOutlined />
+          新建优惠券
+        </Button>,
         <Form
           mode={formMode}
           visible={drawerVisible}

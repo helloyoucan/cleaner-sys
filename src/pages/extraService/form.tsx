@@ -9,9 +9,7 @@ import ProForm, {
   ProFormTextArea,
   ProFormSelect,
 } from '@ant-design/pro-form';
-import { PlusOutlined } from '@ant-design/icons';
 import { EnumExtraServiceStatus } from '@/enum/index';
-import { debounce } from 'lodash';
 import utils from '@/utils/util';
 type Prop = {
   visible: boolean;
@@ -46,12 +44,6 @@ export default (props: Prop) => {
           : DefaultinitialValues
       }
       onVisibleChange={(visible) => updateVisible(visible)}
-      trigger={
-        <Button type="primary">
-          <PlusOutlined />
-          新建附加服务
-        </Button>
-      }
       drawerProps={{
         forceRender: false,
         destroyOnClose: true,

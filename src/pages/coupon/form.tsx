@@ -64,12 +64,6 @@ export default (props: Prop) => {
           : DeafultValues
       }
       onVisibleChange={(visible) => updateVisible(visible)}
-      trigger={
-        <Button type="primary">
-          <PlusOutlined />
-          新建优惠券
-        </Button>
-      }
       drawerProps={{
         forceRender: false,
         destroyOnClose: true,

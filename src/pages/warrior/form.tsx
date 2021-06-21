@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
-import { Button, message } from 'antd';
+import { message } from 'antd';
 import provinceOptions from '@/utils/city';
-import type { FormInstance, Upload } from 'antd';
+import type { FormInstance } from 'antd';
 import { addWarrior, updateWarrior, uploadPath } from '@/api/index';
 import type { WarriorItem } from '@/api/index';
 import ProForm, {
@@ -14,7 +14,6 @@ import ProForm, {
   ProFormRadio,
   ProFormDatePicker,
 } from '@ant-design/pro-form';
-import { PlusOutlined } from '@ant-design/icons';
 import { EnumSex, EnumWarriorStatus } from '@/enum';
 import utils from '@/utils/util';
 type Prop = {
@@ -131,12 +130,6 @@ export default (props: Prop) => {
           setIdCardImageBehind(initialValues?.id_card_image_behind || '');
         updateVisible(visible);
       }}
-      trigger={
-        <Button type="primary">
-          <PlusOutlined />
-          新建战士
-        </Button>
-      }
       drawerProps={{
         forceRender: false,
         destroyOnClose: true,
