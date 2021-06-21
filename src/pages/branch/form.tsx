@@ -1,8 +1,9 @@
-import { useRef } from 'react';
-import { Button, message } from 'antd';
+import { useEffect, useRef, useState } from 'react';
+import { message } from 'antd';
 import provinceOptions from '@/utils/city';
 import type { FormInstance } from 'antd';
 import { addBranch, updateBranch } from '@/api/index';
+import { getLocationIp } from '@/api/index';
 import type { BranchItem } from '@/api/index';
 import ProForm, {
   DrawerForm,
@@ -11,9 +12,9 @@ import ProForm, {
   ProFormDependency,
   ProFormTextArea,
 } from '@ant-design/pro-form';
-import { PlusOutlined } from '@ant-design/icons';
 import { EnumBranchStatus } from '@/enum';
 import utils from '@/utils/util';
+import BaiduMap from '@/components/BaiduMap';
 type Prop = {
   visible: boolean;
   initialValues?: BranchItem;
@@ -21,9 +22,41 @@ type Prop = {
   updateVisible(visable: boolean): void;
   mode: 'read' | 'edit';
 };
+type LocationDataType = {
+  latitude: string;
+  longitude: string;
+  province: string;
+  city: string;
+  area: string;
+  address: string;
+};
+/**
+ * 获取地址信息
+ * @returns
+ */
+const getLocationData = async () => {
+  const res = await getLocationIp();
+  if (res.code == 0) {
+    const { point, address_detail } = res.data.content;
+    return {
+      longitude: point.x,
+      latitude: point.y,
+      province: address_detail.province,
+      city: address_detail.city,
+      area: address_detail.district,
+      address: address_detail.street,
+    };
+  }
+};
 export default (props: Prop) => {
   const { initialValues, visible, updateTable, updateVisible, mode } = props;
   const readOnly = mode == 'read';
+  const [locationData, setLocationData] = useState<LocationDataType>();
+  useEffect(() => {
+    getLocationData().then((locationData: LocationDataType | undefined) => {
+      locationData && setLocationData(locationData);
+    });
+  }, []);
   const formRef = useRef<FormInstance>();
   return (
     <DrawerForm<BranchItem>
@@ -39,15 +72,15 @@ export default (props: Prop) => {
                 initialValues.extra_range_unit_price,
               ),
             }
-          : initialValues
+          : {
+              ...locationData,
+            }
       }
-      onVisibleChange={(visible) => updateVisible(visible)}
-      trigger={
-        <Button type="primary">
-          <PlusOutlined />
-          新建网点
-        </Button>
-      }
+      onVisibleChange={(visible) => {
+        updateVisible(visible);
+        if (visible) {
+        }
+      }}
       drawerProps={{
         forceRender: false,
         destroyOnClose: true,
@@ -100,6 +133,9 @@ export default (props: Prop) => {
         />
       </ProForm.Group>
       <ProForm.Group label="地址">
+        <div style={{ width: '552px' }}>
+          <BaiduMap />
+        </div>
         {initialValues && readOnly && (
           <>
             <ProFormText

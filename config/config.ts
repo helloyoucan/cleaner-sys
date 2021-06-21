@@ -1,5 +1,6 @@
 import { defineConfig } from 'umi';
 import routes from './routes';
+const AK = 'WahIhIS6713Mxfc34t1PI759xGfOorQM';
 export default defineConfig({
   nodeModulesTransform: {
     type: 'none',
@@ -24,4 +25,5 @@ export default defineConfig({
       pathRewrite: { '^/api': '/api' },
     },
   },
+  headScripts: [`//api.map.baidu.com/api?type=webgl&v=1.0&ak=${AK}`],
 });

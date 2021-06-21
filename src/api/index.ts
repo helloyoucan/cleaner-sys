@@ -5,8 +5,8 @@ export const uploadPath = '/api/system/upload';
 export type BranchItem = {
   id?: string;
   name: string;
-  latitude: number;
-  longitude: number;
+  latitude: string;
+  longitude: string;
   province: string;
   city: string;
   area: string;
@@ -292,4 +292,29 @@ export const deleteOrder = (ids: (string | number)[]) =>
   request<APIResponse<number>>({
     method: 'delete',
     url: '/api/system/order?' + utils.array2Query(ids, 'id'),
+  });
+
+type LocationIpRes = {
+  address: string; //详细地址信息
+  content: {
+    address: string; //简要地址信息
+    address_detail: {
+      city: string;
+      city_code: string; //百度城市代码
+      province: string;
+      district: string;
+      street: string;
+      street_number: string;
+    };
+    point: {
+      x: string;
+      y: string;
+    };
+  };
+  status: string; //0正常
+};
+export const getLocationIp = () =>
+  request<APIResponse<LocationIpRes>>({
+    method: 'get',
+    url: `/api/system/location/ip`,
   });

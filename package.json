@@ -28,9 +28,11 @@
     "@umijs/preset-react": "1.x",
     "axios": "^0.21.1",
     "lodash": "^4.17.21",
+    "react-bmapgl": "^0.1.21",
     "umi": "^3.4.25"
   },
   "devDependencies": {
+    "@types/bmapgl": "^0.0.3",
     "@types/lodash": "^4.14.170",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",

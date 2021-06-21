@@ -2,9 +2,10 @@ import { useRef, useState } from 'react';
 import { getBranch, deleteBranch } from '@/api/index';
 import type { BranchItem } from '@/api/index';
 import provinceOptions from '@/utils/city';
-import { Space, Cascader, Popconfirm, message } from 'antd';
+import { Space, Cascader, Popconfirm, message, Button } from 'antd';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
+import { PlusOutlined } from '@ant-design/icons';
 import { EnumBranchStatus } from '@/enum/index';
 import Form from './form';
 import utils from '@/utils/util';
@@ -228,6 +229,10 @@ export default () => {
       }}
       options={{ fullScreen: true }}
       toolBarRender={() => [
+        <Button type="primary" onClick={() => setDrawerVisible(true)}>
+          <PlusOutlined />
+          新建网点
+        </Button>,
         <Form
           mode={formMode}
           visible={drawerVisible}

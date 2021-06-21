@@ -878,6 +878,11 @@
   dependencies:
     "@babel/types" "^7.3.0"
 
+"@types/bmapgl@^0.0.3":
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/@types/bmapgl/-/bmapgl-0.0.3.tgz#1e69879e23a16ee991d360d66c008ac051ac08ad"
+  integrity sha512-F/SKsRR8orBzDoaxSZi/2eycM0Wx/PEtaHi6l9CXZTu+Ewhk/ryo3gwJiSv9O0tlFeMmzKHrhJwBosLy7xr8xA==
+
 "@types/graceful-fs@^4.1.2":
   version "4.1.5"
   resolved "https://registry.yarnpkg.com/@types/graceful-fs/-/graceful-fs-4.1.5.tgz#21ffba0d98da4350db64891f92a9e5db3cdb4e15"
@@ -4862,6 +4867,11 @@ map-visit@^1.0.0:
   dependencies:
     object-visit "^1.0.0"
 
+mapvgl@^1.0.0-beta.125:
+  version "1.0.0-beta.127"
+  resolved "https://registry.yarnpkg.com/mapvgl/-/mapvgl-1.0.0-beta.127.tgz#e22e6c49e2ae6bc4b43d13b993b19b3324a7bf96"
+  integrity sha512-ge7kwOiB9xAOaBPc/N+9K9ykz9ziMOPOShx23KSdPd+4e8RoInoSOYJ95qbB6VHUrfTBA+Ju8ubDr9VmdprDYg==
+
 material-colors@^1.2.1:
   version "1.2.6"
   resolved "https://registry.yarnpkg.com/material-colors/-/material-colors-1.2.6.tgz#6d1958871126992ceecc72f4bcc4d8f010865f46"
@@ -6461,6 +6471,16 @@ rc-virtual-list@^3.0.1, rc-virtual-list@^3.2.0:
     rc-resize-observer "^1.0.0"
     rc-util "^5.0.7"
 
+react-bmapgl@^0.1.21:
+  version "0.1.21"
+  resolved "https://registry.yarnpkg.com/react-bmapgl/-/react-bmapgl-0.1.21.tgz#d765509ab71e90a28ce4d6e3ca14c464aac84719"
+  integrity sha512-SmbznnJd1hHMRcS9mXpI/N9vjJWxvYzSkwraeLEoXkVTujlOzJJZAFOJH8VLN2Z0q2KrGh70Hz03MDiysOZ4JA==
+  dependencies:
+    mapvgl "^1.0.0-beta.125"
+    react "^17.0.1"
+    react-dom "^17.0.1"
+    shallowequal "^1.1.0"
+
 react-color@2.19.3:
   version "2.19.3"
   resolved "https://registry.yarnpkg.com/react-color/-/react-color-2.19.3.tgz#ec6c6b4568312a3c6a18420ab0472e146aa5683d"
@@ -6484,7 +6504,7 @@ react-dom@16.x:
     prop-types "^15.6.2"
     scheduler "^0.19.1"
 
-react-dom@17.x:
+react-dom@17.x, react-dom@^17.0.1:
   version "17.0.2"
   resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-17.0.2.tgz#ecffb6845e3ad8dbfcdc498f0d0a939736502c23"
   integrity sha512-s4h96KtLDUQlsENhMn1ar8t2bEa+q/YAtj8pPPdIjPDGBDIVNsrD9aXNWqspUe6AzKCIG0C1HZZLqLV7qpOBGA==
@@ -6625,7 +6645,7 @@ react@16.x:
     object-assign "^4.1.1"
     prop-types "^15.6.2"
 
-react@17.x:
+react@17.x, react@^17.0.1:
   version "17.0.2"
   resolved "https://registry.yarnpkg.com/react/-/react-17.0.2.tgz#d0b5cc516d29eb3eee383f75b62864cfb6800037"
   integrity sha512-gnhPt75i/dq/z3/6q/0asP78D0u592D5L1pd7M8P+dck6Fu/jJeL6iVVK23fptSUZj8Vjf++7wXA8UNclGQcbA==
