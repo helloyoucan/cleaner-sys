@@ -15,6 +15,7 @@ import ProForm, {
 import { EnumBranchStatus } from '@/enum';
 import utils from '@/utils/util';
 import BaiduMap from '@/components/BaiduMap';
+import TMap from '@/components/TMap';
 type Prop = {
   visible: boolean;
   initialValues?: BranchItem;
@@ -133,6 +134,7 @@ export default (props: Prop) => {
         />
       </ProForm.Group>
       <ProForm.Group label="地址">
+        <TMap></TMap>
         <BaiduMap
           latitude={initialValues?.latitude || locationData?.latitude}
           longitude={initialValues?.longitude || locationData?.longitude}
