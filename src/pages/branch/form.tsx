@@ -136,6 +136,8 @@ export default (props: Prop) => {
         <BaiduMap
           latitude={initialValues?.latitude || locationData?.latitude}
           longitude={initialValues?.longitude || locationData?.longitude}
+          province={initialValues?.province || ''}
+          city={initialValues?.city || ''}
         />
         {initialValues && readOnly && (
           <>

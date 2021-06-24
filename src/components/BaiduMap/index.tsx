@@ -1,60 +1,41 @@
 import React from 'react';
+import { Input } from 'antd';
+import styles from './styles.less';
 import {
   Map,
   Marker,
   ScaleControl,
   ZoomControl,
   AutoComplete,
-  NavigationControl,
-  InfoWindow,
   MapApiLoaderHOC,
 } from 'react-bmapgl';
 type Props = {
   longitude?: string;
   latitude?: string;
+  province?: string;
+  city?: string;
 };
 export default class BdiduMap extends React.Component<Props> {
   map: BMapGL.Map | null | undefined = null;
+  componentDidMount() {
+    var map = new BMapGL.Map('baidu-map'); // 创建地图实例
+    var point = new BMapGL.Point(116.404, 39.915); // 创建点坐标
+    map.centerAndZoom(point, 15);
+  }
   render() {
-    const { longitude, latitude } = this.props;
-    console.log(longitude, latitude);
+    const { longitude, latitude, province, city } = this.props;
+    console.log(province, city);
     const lat = latitude || 39.928216;
     const lng = longitude || 116.402544;
     const center = new BMapGL.Point(+lng, +lat);
     const position = new BMapGL.Point(+lng, +lat);
     return (
-      <Map
-        ref={(ref) => {
-          this.map = ref?.map;
-        }}
-        center={center}
-        zoom={11}
-        style={{ height: 450, width: 552 }}
-      >
-        <Marker
-          position={position}
-          enableDragging
-          icon={'simple_red'}
-          map={this.map as BMapGL.Map}
-        />
-        <ScaleControl map={this.map as BMapGL.Map} />
-        <ZoomControl map={this.map as BMapGL.Map} />
-        <AutoComplete
-          input="ac"
-          onHighlight={(e) => {
-            console.log(e);
-          }}
-          onConfirm={(e) => {
-            console.log(e);
-          }}
-          onSearchComplete={(e) => {
-            console.log(e);
-          }}
-        />
-        <input id="ac" />
-        {/* <NavigationControl />  */}
-        {/* <InfoWindow position={{lng: 116.402544, lat: 39.928216}} text="内容" title="标题"/> */}
-      </Map>
+      <div className={styles.mapContent}>
+        <div className={styles.searchContent}>
+          <Input placeholder="搜索地址" id="ac" />
+        </div>
+        <div id="baidu-map" style={{ height: 450, width: 735 }}></div>
+      </div>
     );
   }
 }
