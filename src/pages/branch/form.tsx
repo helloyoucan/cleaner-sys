@@ -31,33 +31,9 @@ type LocationDataType = {
   area: string;
   address: string;
 };
-/**
- * 获取地址信息
- * @returns
- */
-const getLocationData = async () => {
-  const res = await getLocationIp();
-  if (res.code == 0) {
-    const { point, address_detail } = res.data.content;
-    return {
-      longitude: point.x,
-      latitude: point.y,
-      province: address_detail.province,
-      city: address_detail.city,
-      area: address_detail.district,
-      address: address_detail.street,
-    };
-  }
-};
 export default (props: Prop) => {
   const { initialValues, visible, updateTable, updateVisible, mode } = props;
   const readOnly = mode == 'read';
-  const [locationData, setLocationData] = useState<LocationDataType>();
-  useEffect(() => {
-    getLocationData().then((locationData: LocationDataType | undefined) => {
-      locationData && setLocationData(locationData);
-    });
-  }, []);
   const formRef = useRef<FormInstance>();
   return (
     <DrawerForm<BranchItem>
@@ -74,7 +50,12 @@ export default (props: Prop) => {
               ),
             }
           : {
-              ...locationData,
+              longitude: 0,
+              latitude: 0,
+              province: '',
+              city: '',
+              area: '',
+              address: '',
             }
       }
       onVisibleChange={(visible) => {
@@ -112,13 +93,13 @@ export default (props: Prop) => {
       }}
       onValuesChange={(value: BranchItem, values) => {
         // 省/市 清除选择的值的的联动
-        if (!values.province) {
+        if (value.province) {
           formRef?.current?.setFieldsValue({
             city: null,
             area: null,
           });
         }
-        if (!values.city) {
+        if (value.city) {
           formRef?.current?.setFieldsValue({
             area: null,
           });
@@ -134,13 +115,12 @@ export default (props: Prop) => {
         />
       </ProForm.Group>
       <ProForm.Group label="地址">
-        <TMap></TMap>
-        <BaiduMap
+        {/* <BaiduMap
           latitude={initialValues?.latitude || locationData?.latitude}
           longitude={initialValues?.longitude || locationData?.longitude}
           province={initialValues?.province || ''}
           city={initialValues?.city || ''}
-        />
+        /> */}
         {initialValues && readOnly && (
           <>
             <ProFormText
@@ -218,6 +198,24 @@ export default (props: Prop) => {
           rules={[{ required: true, message: '请输入详细地址' }]}
           readonly={readOnly}
         />
+      </ProForm.Group>
+      <ProForm.Group label="在地图上的位置">
+        <ProFormDependency name={['province', 'city', 'area', 'address']}>
+          {({ province, city, area, address }) => {
+            return (
+              <TMap
+                address={
+                  (province || '') +
+                  (city || '') +
+                  (area || '') +
+                  (address || '')
+                }
+                setLatLng={(lat, log) => {}}
+              ></TMap>
+            );
+          }}
+        </ProFormDependency>
+        <hr />
       </ProForm.Group>
       <ProForm.Group label="费用详细">
         <ProFormText
