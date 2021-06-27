@@ -14,7 +14,6 @@ import ProForm, {
 } from '@ant-design/pro-form';
 import { EnumBranchStatus } from '@/enum';
 import utils from '@/utils/util';
-import BaiduMap from '@/components/BaiduMap';
 import TMap from '@/components/TMap';
 type Prop = {
   visible: boolean;
@@ -23,23 +22,23 @@ type Prop = {
   updateVisible(visable: boolean): void;
   mode: 'read' | 'edit';
 };
-type LocationDataType = {
-  latitude: string;
-  longitude: string;
-  province: string;
-  city: string;
-  area: string;
-  address: string;
-};
 export default (props: Prop) => {
   const { initialValues, visible, updateTable, updateVisible, mode } = props;
   const readOnly = mode == 'read';
   const formRef = useRef<FormInstance>();
+  const [mapSearchAddress, setMapSearchAddress] = useState('');
+  useEffect(() => {
+    if (props.initialValues) {
+      const { province, city, area, address } = props.initialValues;
+      setMapSearchAddress(province + city + area + address);
+    }
+  }, [props.initialValues]);
   return (
     <DrawerForm<BranchItem>
       title={(readOnly ? '查看' : initialValues ? '修改' : '新增') + '网点'}
       formRef={formRef}
       visible={visible}
+      omitNil={false}
       initialValues={
         initialValues
           ? {
@@ -50,8 +49,8 @@ export default (props: Prop) => {
               ),
             }
           : {
-              longitude: 0,
-              latitude: 0,
+              longitude: '',
+              latitude: '',
               province: '',
               city: '',
               area: '',
@@ -60,8 +59,7 @@ export default (props: Prop) => {
       }
       onVisibleChange={(visible) => {
         updateVisible(visible);
-        if (visible) {
-        }
+        visible && setMapSearchAddress('');
       }}
       drawerProps={{
         forceRender: false,
@@ -76,6 +74,9 @@ export default (props: Prop) => {
           extra_range_unit_price: utils.yuan2fen(
             _values.extra_range_unit_price,
           ),
+          range: +_values.range,
+          longitude: _values.longitude.toString(),
+          latitude: _values.latitude.toString(),
         };
         if (initialValues) {
           res = await updateBranch({ ...initialValues, ...values });
@@ -92,18 +93,23 @@ export default (props: Prop) => {
         return true;
       }}
       onValuesChange={(value: BranchItem, values) => {
+        let { province = '', city = '', area = '', address = '' } = values;
         // 省/市 清除选择的值的的联动
-        if (value.province) {
+        if (value.hasOwnProperty('province')) {
           formRef?.current?.setFieldsValue({
-            city: null,
-            area: null,
+            city: '',
+            area: '',
           });
+          city = '';
+          area = '';
         }
-        if (value.city) {
+        if (value.hasOwnProperty('city')) {
           formRef?.current?.setFieldsValue({
-            area: null,
+            area: '',
           });
+          area = '';
         }
+        setMapSearchAddress(province + city + area + address);
       }}
     >
       <ProForm.Group label="网点名称">
@@ -121,26 +127,11 @@ export default (props: Prop) => {
           province={initialValues?.province || ''}
           city={initialValues?.city || ''}
         /> */}
-        {initialValues && readOnly && (
-          <>
-            <ProFormText
-              width="xl"
-              label="经度"
-              name="longitude"
-              readonly={true}
-            />
-            <ProFormText
-              width="xl"
-              label="纬度"
-              name="latitude"
-              readonly={true}
-            />
-          </>
-        )}
         <ProFormSelect
           options={provinceOptions}
           width="sm"
           name="province"
+          showSearch
           placeholder="请选择省/市"
           rules={[{ required: true, message: '请选择省' }]}
           fieldProps={{
@@ -162,6 +153,7 @@ export default (props: Prop) => {
                 options={cityOptions}
                 width="sm"
                 name="city"
+                showSearch
                 placeholder="请选择市/区"
                 rules={[{ required: true, message: '请选择市' }]}
                 readonly={readOnly}
@@ -184,6 +176,7 @@ export default (props: Prop) => {
                 options={areaOptions}
                 width="sm"
                 name="area"
+                showSearch
                 placeholder="请选择区"
                 rules={[{ required: true, message: '请选择区' }]}
                 readonly={readOnly}
@@ -200,22 +193,47 @@ export default (props: Prop) => {
         />
       </ProForm.Group>
       <ProForm.Group label="在地图上的位置">
-        <ProFormDependency name={['province', 'city', 'area', 'address']}>
-          {({ province, city, area, address }) => {
-            return (
-              <TMap
-                address={
-                  (province || '') +
-                  (city || '') +
-                  (area || '') +
-                  (address || '')
-                }
-                setLatLng={(lat, log) => {}}
-              ></TMap>
-            );
-          }}
-        </ProFormDependency>
-        <hr />
+        {visible && (
+          <TMap
+            address={mapSearchAddress}
+            lat={initialValues?.latitude}
+            lng={initialValues?.longitude}
+            setLatLng={(lat, log) => {
+              formRef?.current?.setFieldsValue({
+                longitude: log,
+                latitude: lat,
+              });
+            }}
+          ></TMap>
+        )}
+        <ProFormText
+          width="md"
+          label="经度"
+          name="longitude"
+          disabled={true}
+          required
+          rules={[
+            {
+              validator: async (_, value) => {
+                if (!value) throw new Error('请在地图上选择网点位置');
+              },
+            },
+          ]}
+        />
+        <ProFormText
+          width="md"
+          label="纬度"
+          name="latitude"
+          disabled={true}
+          required
+          rules={[
+            {
+              validator: async (_, value) => {
+                if (!value) throw new Error('请在地图上选择网点位置');
+              },
+            },
+          ]}
+        />
       </ProForm.Group>
       <ProForm.Group label="费用详细">
         <ProFormText

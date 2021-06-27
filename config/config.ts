@@ -1,6 +1,5 @@
 import { defineConfig } from 'umi';
 import routes from './routes';
-const AK = 'WahIhIS6713Mxfc34t1PI759xGfOorQM';
 const Key = 'PSLBZ-Y6GWU-SQOVF-BPOJK-IESTV-TSBZV';
 export default defineConfig({
   nodeModulesTransform: {
@@ -27,7 +26,6 @@ export default defineConfig({
     },
   },
   headScripts: [
-    `//api.map.baidu.com/api?type=webgl&v=1.0&ak=${AK}`,
     `https://map.qq.com/api/js?v=2.exp&key=${Key}&libraries=drawing,place`,
   ],
 });
