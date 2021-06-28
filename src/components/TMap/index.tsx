@@ -118,10 +118,11 @@ export default (props: Props) => {
       inputRef?.current?.blur();
     });
     qq.maps.event.addListener(marker, 'dragging', function (e) {
-      const lat = e.latLng.getLat();
-      const lng = e.latLng.getLng();
+      const lat = Math.round(e.latLng.getLat() * 100000) / 100000;
+      const lng = Math.round(e.latLng.getLng() * 100000) / 100000;
       props.setLatLng(lat, lng);
       const center = new qq.maps.LatLng(lat, lng);
+      marker.setPosition(center);
       circle.setCenter(center);
       debouncegetGeocoderByLocation(
         lat,
