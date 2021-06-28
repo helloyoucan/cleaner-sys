@@ -31,11 +31,12 @@ export default (props: Prop) => {
   const { initialValues, visible, updateTable, updateVisible, mode } = props;
   const readOnly = mode == 'read';
   const formRef = useRef<FormInstance>();
-  const [mapSearchAddress, setMapSearchAddress] = useState('');
+  const [range, setRange] = useState(0);
   useEffect(() => {
     if (props.initialValues) {
-      const { province, city, area, address } = props.initialValues;
-      setMapSearchAddress(province + city + area + address);
+      setRange(props.initialValues.range / 1000);
+    } else {
+      setRange(0);
     }
   }, [props.initialValues]);
   return (
@@ -52,6 +53,7 @@ export default (props: Prop) => {
               extra_range_unit_price: utils.fen2yuan(
                 initialValues.extra_range_unit_price,
               ),
+              range: initialValues.range / 1000,
             }
           : {
               longitude: '',
@@ -64,12 +66,6 @@ export default (props: Prop) => {
       }
       onVisibleChange={(visible) => {
         updateVisible(visible);
-        if (props.initialValues) {
-          const { province, city, area, address } = props.initialValues;
-          setMapSearchAddress(province + city + area + address);
-        } else {
-          setMapSearchAddress('');
-        }
       }}
       drawerProps={{
         forceRender: false,
@@ -84,7 +80,7 @@ export default (props: Prop) => {
           extra_range_unit_price: utils.yuan2fen(
             _values.extra_range_unit_price,
           ),
-          range: +_values.range,
+          range: _values.range * 1000,
           longitude: _values.longitude.toString(),
           latitude: _values.latitude.toString(),
         };
@@ -102,25 +98,24 @@ export default (props: Prop) => {
         updateTable();
         return true;
       }}
-      // onValuesChange={(value: BranchItem, values) => {
-      //   let { province = '', city = '', area = '', address = '' } = values;
-      //   // // 省/市 清除选择的值的的联动
-      //   // if (value.hasOwnProperty('province')) {
-      //   //   formRef?.current?.setFieldsValue({
-      //   //     city: '',
-      //   //     area: '',
-      //   //   });
-      //   //   city = '';
-      //   //   area = '';
-      //   // }
-      //   // if (value.hasOwnProperty('city')) {
-      //   //   formRef?.current?.setFieldsValue({
-      //   //     area: '',
-      //   //   });
-      //   //   area = '';
-      //   // }
-      //   setMapSearchAddress(province + city + area + address);
-      // }}
+      onValuesChange={(value: BranchItem, values) => {
+        value.range && setRange(value.range);
+        // // 省/市 清除选择的值的的联动
+        // if (value.hasOwnProperty('province')) {
+        //   formRef?.current?.setFieldsValue({
+        //     city: '',
+        //     area: '',
+        //   });
+        //   city = '';
+        //   area = '';
+        // }
+        // if (value.hasOwnProperty('city')) {
+        //   formRef?.current?.setFieldsValue({
+        //     area: '',
+        //   });
+        //   area = '';
+        // }
+      }}
     >
       <ProForm.Group label="网点名称">
         <ProFormText
@@ -188,8 +183,10 @@ export default (props: Prop) => {
         {visible && (
           <TMap
             detailsAddress={getdetailsAddress(initialValues)}
+            range={range * 1000}
             lat={initialValues?.latitude}
             lng={initialValues?.longitude}
+            readonly={readOnly}
             setDetailsAddress={(detailsAddress) => {
               formRef?.current?.setFieldsValue({
                 province: detailsAddress.province,
@@ -236,8 +233,8 @@ export default (props: Prop) => {
             },
           ]}
         />
-        <ProFormDependency name={['province', 'city', 'area']}>
-          {({ province, city, area }) => {
+        <ProFormDependency name={['city', 'area']}>
+          {({ city, area }) => {
             return (
               <ProForm.Group>
                 <ProFormText

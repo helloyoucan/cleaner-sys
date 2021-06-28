@@ -6,6 +6,8 @@ import { debounce } from 'lodash';
 const qq = window.qq;
 type Props = {
   detailsAddress: string;
+  range: number;
+  readonly: boolean;
   setLatLng(lat, lng): void;
   setDetailsAddress(detailsAddress: {
     province: string;
@@ -74,6 +76,7 @@ export default (props: Props) => {
   );
   const [map, setMap] = useState<any>();
   const [marker, setMarker] = useState<any>();
+  const [rangeCircle, setRangeCircle] = useState<any>();
   const [isFocus, setIsFocus] = useState(false);
   const inputRef = useRef<any>();
   useEffect(() => {
@@ -86,21 +89,43 @@ export default (props: Props) => {
       zoom: props.detailsAddress ? 20 : 10,
       zoomControlOptions: { position: qq.maps.ControlPosition.BOTTOM_RIGHT },
       panControlOptions: { position: qq.maps.ControlPosition.BOTTOM_RIGHT },
+      scaleControl: true,
+      scaleControlOptions: {
+        //设置控件位置相对右下角对齐，向左排列
+        position: qq.maps.ControlPosition.BOTTOM_RIGHT,
+      },
     });
     const marker = new qq.maps.Marker({
       position: center,
       map: map,
-      draggable: true,
+      draggable: !props.readonly,
       title: '网点位置',
     });
+    const circle = new qq.maps.Circle({
+      map: map,
+      center: center,
+      radius: +props.range,
+      fillColor: new qq.maps.Color(0, 0, 0, 0.3),
+      strokeWeight: 2,
+    });
+    setMarker(marker);
+    setMap(map);
+    setRangeCircle(circle);
+    // qq.maps.event.addListener(circle, 'radius_changed', function (e) {
+    //   console.log(props.range)
+    // });
     qq.maps.event.addListener(marker, 'mousedown', function (e) {
       inputRef?.current?.blur();
     });
     qq.maps.event.addListener(marker, 'dragging', function (e) {
-      props.setLatLng(e.latLng.getLat(), e.latLng.getLng());
+      const lat = e.latLng.getLat();
+      const lng = e.latLng.getLng();
+      props.setLatLng(lat, lng);
+      const center = new qq.maps.LatLng(lat, lng);
+      circle.setCenter(center);
       debouncegetGeocoderByLocation(
-        e.latLng.getLat(),
-        e.latLng.getLng(),
+        lat,
+        lng,
         ({ details, province, city, area, address }) => {
           setIsFocus(false);
           setInputValue(details);
@@ -108,12 +133,11 @@ export default (props: Props) => {
         },
       );
     });
-    setMarker(marker);
-    setMap(map);
     // return ()=>{
     //   map.destroy();
     //   setMap(null);
     // }
+    console.log(props.range);
   }, []);
   useEffect(() => {
     isFocus &&
@@ -125,11 +149,17 @@ export default (props: Props) => {
           const center = new qq.maps.LatLng(lat, lng);
           map.setOptions({ center, zoom });
           marker.setPosition(center);
+          rangeCircle && rangeCircle.setCenter(center);
           props.setDetailsAddress({ province, city, area, address });
           props.setLatLng(lat, lng);
         },
       );
   }, [inputValue]);
+  useEffect(() => {
+    if (map && !isNaN(props.range)) {
+      rangeCircle.setRadius(+props.range);
+    }
+  }, [props.range]);
   return (
     <div
       style={{ width: 735, height: 450 }}
@@ -145,6 +175,7 @@ export default (props: Props) => {
           onFocus={() => setIsFocus(true)}
           onBlur={() => setIsFocus(false)}
           onChange={(event) => setInputValue(event.target.value)}
+          disabled={props.readonly}
         />
       </div>
     </div>
