@@ -1,12 +1,18 @@
-import { getGeocoder } from '@/api/TMap';
-import { Input } from 'antd';
-import { useEffect, useState } from 'react';
+import { getGeocoderByAddress, getGeocoderByLocation } from '@/api/TMap';
+import { Input, message } from 'antd';
+import { useEffect, useRef, useState } from 'react';
 import styles from './styles.less';
 import { debounce } from 'lodash';
 const qq = window.qq;
 type Props = {
-  address: string;
+  detailsAddress: string;
   setLatLng(lat, lng): void;
+  setDetailsAddress(detailsAddress: {
+    province: string;
+    city;
+    area;
+    address;
+  }): void;
   lat?: string;
   lng?: string;
 };
@@ -14,28 +20,62 @@ const DefauleLatLng = {
   lat: '22.53332',
   lng: '113.93041',
 };
-const debounceGetGeocoder = debounce((address, cb) => {
-  getGeocoder(address).then((res) => {
+const debouncegetGeocoderByAddress = debounce((address, cb) => {
+  getGeocoderByAddress(address).then((res) => {
     if (res.code == 0 && res.data.status == 0) {
-      const result = res.data.result;
       let zoom = 20;
-      if (result.title == result.address_components.province) zoom = 5;
-      if (result.title == result.address_components.city) zoom = 10;
-      if (result.title == result.address_components.district) zoom = 12;
+      const { title, location, address_components } = res.data.result;
+      const { province, city, district } = address_components;
+      let address = title;
+      if (title == province) zoom = 5;
+      if (title == city) {
+        zoom = 10;
+        address = '';
+      }
+      if (title == district) {
+        zoom = 12;
+        address = '';
+      }
       cb({
-        lat: result.location.lat,
-        lng: result.location.lng,
+        lat: location.lat,
+        lng: location.lng,
         zoom,
+        province,
+        city,
+        area: district,
+        address,
       });
     }
   });
 }, 1000);
+const debouncegetGeocoderByLocation = debounce((lat, lng, cb) => {
+  getGeocoderByLocation(lat, lng).then((res) => {
+    if (
+      res.code == 0 &&
+      res.data.status == 0 &&
+      res.data.result.address_component.nation == '中国'
+    ) {
+      const result = res.data.result;
+      cb({
+        details: result.address,
+        province: result.address_component.province,
+        city: result.address_component.city,
+        area: result.address_component.district,
+        address: result.formatted_addresses.recommend,
+      });
+    } else {
+      message.warning('解析地址有误');
+    }
+  });
+}, 1000);
 export default (props: Props) => {
-  console.log(props);
-  const [inputValue, setInputValue] = useState<string>(props.address);
-  console.log('inputValue', inputValue);
+  const [inputValue, setInputValue] = useState<string>(
+    props.detailsAddress || '',
+  );
   const [map, setMap] = useState<any>();
   const [marker, setMarker] = useState<any>();
+  const [isFocus, setIsFocus] = useState(false);
+  const inputRef = useRef<any>();
   useEffect(() => {
     const center = new qq.maps.LatLng(
       props.lat || DefauleLatLng.lat,
@@ -43,7 +83,7 @@ export default (props: Props) => {
     );
     const map = new qq.maps.Map(document.getElementById('TMap'), {
       center,
-      zoom: props.address ? 20 : 10,
+      zoom: props.detailsAddress ? 20 : 10,
       zoomControlOptions: { position: qq.maps.ControlPosition.BOTTOM_RIGHT },
       panControlOptions: { position: qq.maps.ControlPosition.BOTTOM_RIGHT },
     });
@@ -53,27 +93,43 @@ export default (props: Props) => {
       draggable: true,
       title: '网点位置',
     });
-    // setTimeout(()=>{
-    //   console.log(props)
-    //   // 等父元素表单渲染完毕再更新
-    //   !props.lat && props.setLatLng(DefauleLatLng.lat, DefauleLatLng.lng)
-    // })
+    qq.maps.event.addListener(marker, 'mousedown', function (e) {
+      inputRef?.current?.blur();
+    });
     qq.maps.event.addListener(marker, 'dragging', function (e) {
       props.setLatLng(e.latLng.getLat(), e.latLng.getLng());
+      debouncegetGeocoderByLocation(
+        e.latLng.getLat(),
+        e.latLng.getLng(),
+        ({ details, province, city, area, address }) => {
+          setIsFocus(false);
+          setInputValue(details);
+          props.setDetailsAddress({ province, city, area, address });
+        },
+      );
     });
     setMarker(marker);
     setMap(map);
+    // return ()=>{
+    //   map.destroy();
+    //   setMap(null);
+    // }
   }, []);
   useEffect(() => {
-    setInputValue(props.address);
-    map &&
-      props.address &&
-      debounceGetGeocoder(props.address, ({ lat, lng, zoom }) => {
-        const center = new qq.maps.LatLng(lat, lng);
-        map.setOptions({ center, zoom });
-        marker.setPosition(center);
-      });
-  }, [props.address]);
+    isFocus &&
+      map &&
+      inputValue &&
+      debouncegetGeocoderByAddress(
+        inputValue,
+        ({ lat, lng, zoom, province, city, area, address }) => {
+          const center = new qq.maps.LatLng(lat, lng);
+          map.setOptions({ center, zoom });
+          marker.setPosition(center);
+          props.setDetailsAddress({ province, city, area, address });
+          props.setLatLng(lat, lng);
+        },
+      );
+  }, [inputValue]);
   return (
     <div
       style={{ width: 735, height: 450 }}
@@ -82,8 +138,12 @@ export default (props: Props) => {
     >
       <div className={styles.searchContent}>
         <Input
-          placeholder="搜索地址"
+          ref={inputRef}
+          placeholder="请输入地址"
+          style={{ width: '500px' }}
           value={inputValue}
+          onFocus={() => setIsFocus(true)}
+          onBlur={() => setIsFocus(false)}
           onChange={(event) => setInputValue(event.target.value)}
         />
       </div>

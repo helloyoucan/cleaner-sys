@@ -4,7 +4,7 @@ export const getLocation = () =>
   TMapRequest({
     url: '/ws/location/v1/ip',
   });
-type GeocoderRes = {
+type GeocoderByAddressRes = {
   status: number;
   message: string;
   result: {
@@ -29,10 +29,41 @@ type GeocoderRes = {
     level: number;
   };
 };
-export const getGeocoder = (address: string) =>
-  TMapRequest<GeocoderRes>({
+export const getGeocoderByAddress = (address: string) =>
+  TMapRequest<GeocoderByAddressRes>({
     url: '/ws/geocoder/v1/',
     data: {
       address,
+    },
+  });
+type GeocoderByLocationRes = {
+  status: number;
+  message: string;
+  result: {
+    location: {
+      lat: number;
+      lng: number;
+    };
+    address: string;
+    formatted_addresses: {
+      recommend: string;
+      rough: string;
+    };
+    address_component: {
+      nation: string;
+      province: string;
+      city: string;
+      district: string;
+      street: string;
+      street_number: string;
+    };
+  };
+};
+export const getGeocoderByLocation = (lat, lng) =>
+  TMapRequest<GeocoderByLocationRes>({
+    url: '/ws/geocoder/v1/',
+    data: {
+      location: `${lat},${lng}`,
+      poi_options: 'policy=2',
     },
   });
